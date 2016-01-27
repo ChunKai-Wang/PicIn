@@ -2,11 +2,14 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>500</width>
     <height>199</height>
    </rect>
   </property>
@@ -14,27 +17,16 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="3" column="3">
-       <widget class="QPushButton" name="button_browse_target">
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_source">
         <property name="text">
-         <string>browse</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="3">
-       <widget class="QPushButton" name="button_import">
-        <property name="text">
-         <string>import</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="3">
-       <widget class="QPushButton" name="button_quit">
-        <property name="text">
-         <string>quit</string>
+         <string>Source</string>
         </property>
        </widget>
       </item>
@@ -51,10 +43,17 @@
       <item row="3" column="1">
        <widget class="QLineEdit" name="lineEdit_path_target"/>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_source">
+      <item row="3" column="3">
+       <widget class="QPushButton" name="button_browse_target">
         <property name="text">
-         <string>Source</string>
+         <string>browse</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="3">
+       <widget class="QPushButton" name="button_quit">
+        <property name="text">
+         <string>quit</string>
         </property>
        </widget>
       </item>
@@ -62,6 +61,13 @@
        <widget class="QLabel" name="label_target">
         <property name="text">
          <string>Target</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="3">
+       <widget class="QPushButton" name="button_import">
+        <property name="text">
+         <string>import</string>
         </property>
        </widget>
       </item>
@@ -74,7 +80,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>400</width>
+     <width>500</width>
      <height>22</height>
     </rect>
    </property>

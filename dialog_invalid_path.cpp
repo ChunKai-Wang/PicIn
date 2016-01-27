@@ -14,6 +14,10 @@ dialog_invalid_path::~dialog_invalid_path()
     delete ui;
 }
 
+//
+// Public functions
+//
+
 void dialog_invalid_path::set_label_text(QString label_text)
 {
     ui->label_text_invalid_path->setText(label_text);

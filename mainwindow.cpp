@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "dialog_invalid_path.h"
+#include "ui_dialog_invalid_path.h"
 #include <QApplication>
 
 #include <QFileDialog>
@@ -23,6 +24,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->button_browse_target, SIGNAL(clicked(bool)), this, SLOT(slot_button_browse_target_clicked()));
     connect(ui->button_import, SIGNAL(clicked(bool)), this, SLOT(slot_button_import_clicked()));
     connect(this, SIGNAL(signal_show_dialog(QString)), this, SLOT(slot_show_dialog(QString)));
+    connect(this, SIGNAL(signal_enalbe_window()), this, SLOT(slot_enable_window()));
+    connect(this, SIGNAL(signal_disable_window()), this, SLOT(slot_disable_window()));
 }
 
 MainWindow::~MainWindow()
@@ -94,7 +97,9 @@ void MainWindow::copy_files_as_list(
         filePath.clear();
         filePath.append(path_target);
         filePath.append(fileName);
-        file.copy(fileInfoList.at(i).absoluteFilePath(), filePath);
+        if(!file.exists(filePath)){
+            file.copy(fileInfoList.at(i).absoluteFilePath(), filePath);
+        }
     }
 }
 
@@ -155,13 +160,15 @@ void MainWindow::slot_button_import_clicked(void)
     }
 
     //
-    // Check path last char
+    // Check whether path has forward slash at last char
     //
 
     QSysInfo sysInfo;
     QString osVer = sysInfo.kernelType();
+
     QString path_source = ui->lineEdit_path_source->text();
     QString path_target = ui->lineEdit_path_target->text();
+
     QChar lastChar_s = path_source.at(path_source.size() - 1);
     QChar lastChar_t = path_target.at(path_target.size() - 1);
     QChar fSlash = QChar('/');
@@ -201,7 +208,7 @@ void MainWindow::slot_button_import_clicked(void)
     QStringList nameFilters;
 
     nameFilters.append(tr("*.jpg"));
-    retFileInfoList = get_file_list(path_source, nameFilters);
+    retFileInfoList = MainWindow::get_file_list(path_source, nameFilters);
     if(retFileInfoList.size() <= 0){
         emit signal_show_dialog("No Pictures");
     }
@@ -210,7 +217,7 @@ void MainWindow::slot_button_import_clicked(void)
     // Import
     //
 
-    copy_files_as_list(retFileInfoList, path_target);
+    MainWindow::copy_files_as_list(retFileInfoList, path_target);
 }
 
 void MainWindow::slot_show_dialog(QString infoToShow)
@@ -219,9 +226,22 @@ void MainWindow::slot_show_dialog(QString infoToShow)
     dialogInvalidPathUi->setParent(0);
     dialogInvalidPathUi->set_label_text(infoToShow);
     dialogInvalidPathUi->show();
+    emit signal_disable_window();
+    dialogInvalidPathUi->setAttribute(Qt::WA_DeleteOnClose);
+    connect(dialogInvalidPathUi->ui->verticalLayout, SIGNAL(destroyed(QObject*)), this, SLOT(slot_enable_window()));
 }
 
 void MainWindow::slot_button_quit_clicked(void)
 {
     QApplication::instance()->quit();
+}
+
+void MainWindow::slot_enable_window(void)
+{
+    MainWindow::setEnabled(true);
+}
+
+void MainWindow::slot_disable_window(void)
+{
+    MainWindow::setEnabled(false);
 }
