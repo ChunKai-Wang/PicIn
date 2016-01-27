@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QFileInfoList>
 
 namespace Ui {
 class MainWindow;
@@ -17,6 +18,9 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
+    QFileInfoList get_file_list(QString path, QStringList exNameFilters);
+    void copy_files_as_list(QFileInfoList fileInfoList, QString path_target);
 
 signals:
     void signal_show_dialog(QString);

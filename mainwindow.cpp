@@ -37,7 +37,10 @@ MainWindow::~MainWindow()
 
 //name : get_file_list
 //desc : Scan indicated path and return file info list of images
-QFileInfoList get_file_list(QString path, QStringList exNameFilters)
+QFileInfoList MainWindow::get_file_list(
+        QString path,
+        QStringList exNameFilters
+)
 {
     QDir dir(path);
     QStringList nameFilters;
@@ -65,7 +68,9 @@ QFileInfoList get_file_list(QString path, QStringList exNameFilters)
     dirInfoList = dir.entryInfoList();
 
     for(int i = 0; i < dirInfoList.size(); i++){
-        fileInfoList.append(get_file_list(dirInfoList.at(i).absoluteFilePath(), exNameFilters));
+        fileInfoList.append(
+                        get_file_list(dirInfoList.at(i).absoluteFilePath(),
+                        exNameFilters));
     }
 
     return fileInfoList;
@@ -73,7 +78,10 @@ QFileInfoList get_file_list(QString path, QStringList exNameFilters)
 
 //name : copy_file_as_list
 //desc : Copy files to specific location as list
-void copy_files_as_list(QFileInfoList fileInfoList, QString path_target)
+void MainWindow::copy_files_as_list(
+        QFileInfoList fileInfoList,
+        QString path_target
+)
 {
     QFile file;
     QString fileName;
@@ -132,16 +140,54 @@ void MainWindow::slot_button_browse_target_clicked(void)
 
 void MainWindow::slot_button_import_clicked(void)
 {
-    QFileInfoList retFileInfoList;
-    QDir dir_s(ui->lineEdit_path_source->text());
-    QDir dir_t(ui->lineEdit_path_target->text());
+    //
+    // Check empty path
+    //
 
-    if(!dir_s.exists() || !ui->lineEdit_path_source->text().compare(tr(""), Qt::CaseInsensitive)){
+    if(!ui->lineEdit_path_source->text().compare(tr(""), Qt::CaseInsensitive)){
+        emit signal_show_dialog(tr("Please input source path"));
+        return;
+    }
+
+    if(!ui->lineEdit_path_target->text().compare(tr(""), Qt::CaseInsensitive)){
+        emit signal_show_dialog(tr("Please input target path"));
+        return;
+    }
+
+    //
+    // Check path last char
+    //
+
+    QSysInfo sysInfo;
+    QString osVer = sysInfo.kernelType();
+    QString path_source = ui->lineEdit_path_source->text();
+    QString path_target = ui->lineEdit_path_target->text();
+    QChar lastChar_s = path_source.at(path_source.size() - 1);
+    QChar lastChar_t = path_target.at(path_target.size() - 1);
+    QChar fSlash = QChar('/');
+
+    if(!osVer.compare("linux", Qt::CaseInsensitive)){
+        if(!operator ==(lastChar_s, fSlash)){
+            path_source.append("/");
+        }
+        if(!operator ==(lastChar_t, fSlash)){
+            path_target.append("/");
+        }
+    }
+
+    //
+    // Check path
+    //
+
+    QDir dir_s(path_source);
+    QDir dir_t(path_target);
+
+    if(!dir_s.exists()){
         emit signal_show_dialog(tr("Invalid source path"));
         return;
     }
 
-    if(!dir_t.exists() || !ui->lineEdit_path_target->text().compare(tr(""), Qt::CaseInsensitive)){
+    if(!dir_t.exists()){
         emit signal_show_dialog(tr("Invalid target path"));
         return;
     }
@@ -150,10 +196,12 @@ void MainWindow::slot_button_import_clicked(void)
     //
     // Get file list
     //
+
+    QFileInfoList retFileInfoList;
     QStringList nameFilters;
 
     nameFilters.append(tr("*.jpg"));
-    retFileInfoList = get_file_list(ui->lineEdit_path_source->text(), nameFilters);
+    retFileInfoList = get_file_list(path_source, nameFilters);
     if(retFileInfoList.size() <= 0){
         emit signal_show_dialog("No Pictures");
     }
@@ -162,7 +210,7 @@ void MainWindow::slot_button_import_clicked(void)
     // Import
     //
 
-    copy_files_as_list(retFileInfoList, ui->lineEdit_path_target->text());
+    copy_files_as_list(retFileInfoList, path_target);
 }
 
 void MainWindow::slot_show_dialog(QString infoToShow)
