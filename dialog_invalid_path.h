@@ -16,7 +16,6 @@ public:
     ~dialog_invalid_path();
     void set_label_text(QString);
 
-//private:
     Ui::dialog_invalid_path *ui;
 };
 

@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "dialog_invalid_path.h"
+#include "dialogimportchecker.h"
+#include "ui_dialogimportchecker.h"
 #include "ui_dialog_invalid_path.h"
 #include <QApplication>
 
@@ -79,30 +81,6 @@ QFileInfoList MainWindow::get_file_list(
     return fileInfoList;
 }
 
-//name : copy_file_as_list
-//desc : Copy files to specific location as list
-void MainWindow::copy_files_as_list(
-        QFileInfoList fileInfoList,
-        QString path_target
-)
-{
-    QFile file;
-    QString fileName;
-    QString filePath;
-
-    for(int i = 0; i < fileInfoList.size(); i++){
-        fileName.clear();
-        fileName.append(fileInfoList.at(i).fileName());
-
-        filePath.clear();
-        filePath.append(path_target);
-        filePath.append(fileName);
-        if(!file.exists(filePath)){
-            file.copy(fileInfoList.at(i).absoluteFilePath(), filePath);
-        }
-    }
-}
-
 //
 // slots
 //
@@ -166,19 +144,19 @@ void MainWindow::slot_button_import_clicked(void)
     QSysInfo sysInfo;
     QString osVer = sysInfo.kernelType();
 
-    QString path_source = ui->lineEdit_path_source->text();
-    QString path_target = ui->lineEdit_path_target->text();
+    m_path_source = ui->lineEdit_path_source->text();
+    m_path_target = ui->lineEdit_path_target->text();
 
-    QChar lastChar_s = path_source.at(path_source.size() - 1);
-    QChar lastChar_t = path_target.at(path_target.size() - 1);
+    QChar lastChar_s = m_path_source.at(m_path_source.size() - 1);
+    QChar lastChar_t = m_path_target.at(m_path_target.size() - 1);
     QChar fSlash = QChar('/');
 
     if(!osVer.compare("linux", Qt::CaseInsensitive)){
         if(!operator ==(lastChar_s, fSlash)){
-            path_source.append("/");
+            m_path_source.append("/");
         }
         if(!operator ==(lastChar_t, fSlash)){
-            path_target.append("/");
+            m_path_target.append("/");
         }
     }
 
@@ -186,8 +164,8 @@ void MainWindow::slot_button_import_clicked(void)
     // Check path
     //
 
-    QDir dir_s(path_source);
-    QDir dir_t(path_target);
+    QDir dir_s(m_path_source);
+    QDir dir_t(m_path_target);
 
     if(!dir_s.exists()){
         emit signal_show_dialog(tr("Invalid source path"));
@@ -204,31 +182,81 @@ void MainWindow::slot_button_import_clicked(void)
     // Get file list
     //
 
-    QFileInfoList retFileInfoList;
     QStringList nameFilters;
 
     nameFilters.append(tr("*.jpg"));
-    retFileInfoList = MainWindow::get_file_list(path_source, nameFilters);
-    if(retFileInfoList.size() <= 0){
+    m_fileInfoList_img.clear();
+    m_fileInfoList_img = MainWindow::get_file_list(m_path_source, nameFilters);
+    if(m_fileInfoList_img.size() <= 0){
         emit signal_show_dialog("No Pictures");
     }
 
     //
-    // Import
+    // Check
     //
 
-    MainWindow::copy_files_as_list(retFileInfoList, path_target);
+    QString fileNum;
+    fileNum.sprintf("%d files will imported", m_fileInfoList_img.size());
+    MainWindow::slot_show_import_checker(fileNum);
 }
 
 void MainWindow::slot_show_dialog(QString infoToShow)
 {
     dialog_invalid_path *dialogInvalidPathUi = new dialog_invalid_path(0);
+
+    //Show dialog
     dialogInvalidPathUi->setParent(0);
     dialogInvalidPathUi->set_label_text(infoToShow);
     dialogInvalidPathUi->show();
+
+    //Disable main window
     emit signal_disable_window();
+
+    //Enable main window once dialog been closed
     dialogInvalidPathUi->setAttribute(Qt::WA_DeleteOnClose);
-    connect(dialogInvalidPathUi->ui->verticalLayout, SIGNAL(destroyed(QObject*)), this, SLOT(slot_enable_window()));
+    connect(dialogInvalidPathUi, SIGNAL(destroyed(QObject*)), this, SLOT(slot_enable_window()));
+}
+
+//name : slot_show_import_checker
+//desc : show DialogImportChecker
+void MainWindow::slot_show_import_checker(QString infoToShow){
+
+    emit signal_disable_window();
+
+    DialogImportChecker *DialogImportCheckerUi = new DialogImportChecker;
+    DialogImportCheckerUi->setParent(0);
+    DialogImportCheckerUi->ui->label_sts->setText(infoToShow);
+    DialogImportCheckerUi->setWindowTitle(tr(" "));
+    DialogImportCheckerUi->show();
+
+    DialogImportCheckerUi->setAttribute(Qt::WA_DeleteOnClose);
+    connect(DialogImportCheckerUi, SIGNAL(destroyed(QObject*)), this, SLOT(slot_enable_window()));
+    connect(DialogImportCheckerUi, SIGNAL(accepted()), this, SLOT(slot_import()));
+}
+
+//name : slot_import
+//desc : Copy files to specific location as list
+void MainWindow::slot_import()
+{
+    QFile file;
+    QString fileName;
+    QString filePath;
+
+    emit this->signal_disable_window();
+
+    for(int i = 0; i < this->m_fileInfoList_img.size(); i++){
+        fileName.clear();
+        fileName.append(this->m_fileInfoList_img.at(i).fileName());
+
+        filePath.clear();
+        filePath.append(m_path_target);
+        filePath.append(fileName);
+        if(!file.exists(filePath)){
+            file.copy(this->m_fileInfoList_img.at(i).absoluteFilePath(), filePath);
+        }
+    }
+
+    emit this->signal_enalbe_window();
 }
 
 void MainWindow::slot_button_quit_clicked(void)
