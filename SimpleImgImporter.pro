@@ -15,14 +15,17 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     dialog_invalid_path.cpp \
-    dialogimportchecker.cpp
+    dialogimportchecker.cpp \
+    dialog_import_progress.cpp
 
 HEADERS  += mainwindow.h \
     dialog_invalid_path.h \
-    dialogimportchecker.h
+    dialogimportchecker.h \
+    dialog_import_progress.h
 
 FORMS    += mainwindow.ui \
     dialog_invalid_path.ui \
-    dialogimportchecker.ui
+    dialogimportchecker.ui \
+    dialog_import_progress.ui
 
 DISTFILES +=

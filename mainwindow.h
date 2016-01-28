@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QFileInfoList>
 
+#include "dialog_import_progress.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -24,6 +26,7 @@ private:
     QFileInfoList m_fileInfoList_img;
     QString m_path_source;
     QString m_path_target;
+    bool m_flag_cancel;
 
 signals:
     void signal_show_dialog(QString);
@@ -34,6 +37,7 @@ public slots:
     void slot_enable_window(void);
     void slot_disable_window(void);
     void slot_import();
+    void slot_set_flag_cancel();
 
 private slots:
     void slot_button_browse_source_clicked(void);

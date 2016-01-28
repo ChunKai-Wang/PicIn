@@ -2,8 +2,11 @@
 #include "ui_mainwindow.h"
 #include "dialog_invalid_path.h"
 #include "dialogimportchecker.h"
+#include "dialog_import_progress.h"
 #include "ui_dialogimportchecker.h"
 #include "ui_dialog_invalid_path.h"
+#include "ui_dialog_import_progress.h"
+
 #include <QApplication>
 
 #include <QFileDialog>
@@ -19,6 +22,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    m_flag_cancel = false;
 
     //connect
     connect(ui->button_quit, SIGNAL(clicked(bool)), this, SLOT(slot_button_quit_clicked()));
@@ -223,15 +228,15 @@ void MainWindow::slot_show_import_checker(QString infoToShow){
 
     emit signal_disable_window();
 
-    DialogImportChecker *DialogImportCheckerUi = new DialogImportChecker;
-    DialogImportCheckerUi->setParent(0);
-    DialogImportCheckerUi->ui->label_sts->setText(infoToShow);
-    DialogImportCheckerUi->setWindowTitle(tr(" "));
-    DialogImportCheckerUi->show();
+    DialogImportChecker *dialogImportChecker = new DialogImportChecker(0);
+    dialogImportChecker->setParent(0);
+    dialogImportChecker->ui->label_sts->setText(infoToShow);
+    dialogImportChecker->setWindowTitle(tr(" "));
+    dialogImportChecker->show();
 
-    DialogImportCheckerUi->setAttribute(Qt::WA_DeleteOnClose);
-    connect(DialogImportCheckerUi, SIGNAL(destroyed(QObject*)), this, SLOT(slot_enable_window()));
-    connect(DialogImportCheckerUi, SIGNAL(accepted()), this, SLOT(slot_import()));
+    dialogImportChecker->setAttribute(Qt::WA_DeleteOnClose);
+    connect(dialogImportChecker, SIGNAL(rejected()), this, SLOT(slot_enable_window()));
+    connect(dialogImportChecker, SIGNAL(accepted()), this, SLOT(slot_import()));
 }
 
 //name : slot_import
@@ -244,6 +249,27 @@ void MainWindow::slot_import()
 
     emit this->signal_disable_window();
 
+    //
+    // Prepare progress bar
+    //
+
+    Dialog_Import_Progress *dialogImportProgress = new Dialog_Import_Progress(0);
+    dialogImportProgress->setParent(0);
+    dialogImportProgress->setAttribute(Qt::WA_DeleteOnClose);
+    dialogImportProgress->setWindowTitle(tr(" "));
+    dialogImportProgress->ui->progressBar->setRange(0, m_fileInfoList_img.size());
+    dialogImportProgress->ui->progressBar->setValue(0);
+    dialogImportProgress->show();
+
+    connect(dialogImportProgress, SIGNAL(rejected()), this, SLOT(slot_set_flag_cancel()));
+
+    //
+    // Import files
+    //
+
+    //If we don;t do this proccessEvents(),
+    //progress dialog would no response until this function done.
+    QApplication::processEvents(QEventLoop::AllEvents);
     for(int i = 0; i < this->m_fileInfoList_img.size(); i++){
         fileName.clear();
         fileName.append(this->m_fileInfoList_img.at(i).fileName());
@@ -254,9 +280,29 @@ void MainWindow::slot_import()
         if(!file.exists(filePath)){
             file.copy(this->m_fileInfoList_img.at(i).absoluteFilePath(), filePath);
         }
+        dialogImportProgress->ui->progressBar->setValue(i);
+        if(m_flag_cancel){
+            break;
+        }
+
+        QApplication::processEvents(QEventLoop::AllEvents);
     }
 
+    //
+    // done.
+    //
+
+    dialogImportProgress->close();
+    m_flag_cancel = false;
+
     emit this->signal_enalbe_window();
+}
+
+//name : slot_set_flag_cancel
+//desc : Set m_flag_cancel to true
+void MainWindow::slot_set_flag_cancel(void)
+{
+    MainWindow::m_flag_cancel = true;
 }
 
 void MainWindow::slot_button_quit_clicked(void)
