@@ -16,12 +16,14 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     dialog_invalid_path.cpp \
     dialogimportchecker.cpp \
-    dialog_import_progress.cpp
+    dialog_import_progress.cpp \
+    picin_core.cpp
 
 HEADERS  += mainwindow.h \
     dialog_invalid_path.h \
     dialogimportchecker.h \
-    dialog_import_progress.h
+    dialog_import_progress.h \
+    picin_core.h
 
 FORMS    += mainwindow.ui \
     dialog_invalid_path.ui \

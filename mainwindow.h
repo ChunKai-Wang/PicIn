@@ -2,9 +2,19 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QFileInfoList>
+#include <QApplication>
+#include <QFileDialog>
+#include <QPushButton>
 
+#include "ui_mainwindow.h"
+#include "dialog_invalid_path.h"
+#include "dialogimportchecker.h"
 #include "dialog_import_progress.h"
+#include "ui_dialogimportchecker.h"
+#include "ui_dialog_invalid_path.h"
+#include "ui_dialog_import_progress.h"
+#include "picin_core.h"
+#include "picin_core.h"
 
 namespace Ui {
 class MainWindow;
@@ -20,13 +30,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
-
-    QFileInfoList get_file_list(QString path, QStringList exNameFilters);
-
-    QFileInfoList m_fileInfoList_img;
-    QString m_path_source;
-    QString m_path_target;
-    bool m_flag_cancel;
+    PicIn_Core *m_picInCore;
 
 signals:
     void signal_show_dialog(QString);
@@ -37,7 +41,6 @@ public slots:
     void slot_enable_window(void);
     void slot_disable_window(void);
     void slot_import();
-    void slot_set_flag_cancel();
 
 private slots:
     void slot_button_browse_source_clicked(void);
@@ -45,7 +48,6 @@ private slots:
     void slot_button_import_clicked(void);
     void slot_button_quit_clicked(void);
     void slot_show_dialog(QString);
-    void slot_show_import_checker(QString);
 };
 
 #endif // MAINWINDOW_H
