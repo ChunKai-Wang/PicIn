@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>SimpleImgImporter</class>
- <widget class="QMainWindow" name="SimpleImgImporter">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
   <property name="enabled">
    <bool>true</bool>
   </property>
