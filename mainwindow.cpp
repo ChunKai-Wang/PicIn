@@ -7,6 +7,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     this->setWindowTitle(tr("PicIn"));
 
+    //Initialize radio buttons
+    ui->radioBtn_dirAsY->setEnabled(false);
+    ui->radioBtn_dirAsYM->setEnabled(false);
+    ui->radioBtn_dirAsYMD->setEnabled(false);
+
+    //declare PicIn_core
     m_picInCore = new PicIn_Core;
 
     //connect
@@ -17,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(signal_show_dialog(QString)), this, SLOT(slot_show_dialog(QString)));
     connect(this, SIGNAL(signal_enalbe_window()), this, SLOT(slot_enable_window()));
     connect(this, SIGNAL(signal_disable_window()), this, SLOT(slot_disable_window()));
+    connect(ui->checkBox_dirAsDate, SIGNAL(clicked(bool)), this, SLOT(slot_checkbox_dirAsDate_clicked()));
 }
 
 MainWindow::~MainWindow()
@@ -55,6 +62,27 @@ void MainWindow::slot_import()
     // Import files
     //
 
+    if(ui->checkBox_dirAsDate->isChecked()){
+        bool dirAsY = false;
+        bool dirAsM = false;
+        bool dirAsD = false;
+        if(ui->radioBtn_dirAsY->isChecked()){
+            dirAsY = true;
+        }
+        else if(ui->radioBtn_dirAsYM->isChecked()){
+            dirAsY = true;
+            dirAsM = true;
+        }
+        else if(ui->radioBtn_dirAsYMD->isChecked()){
+            dirAsY = true;
+            dirAsM = true;
+            dirAsD = true;
+        }
+        m_picInCore->setFlagDir(dirAsY, dirAsM, dirAsD);
+    }
+    else{
+        m_picInCore->setFlagDir(false, false, false);
+    }
     m_picInCore->import_doit();
 
     //
@@ -249,3 +277,15 @@ void MainWindow::slot_button_quit_clicked(void)
     QApplication::instance()->quit();
 }
 
+/*
+ * name : slot_checkbox_dirAsDate_clicked
+ * desc : Clicked checkBox_dirAsDate
+ */
+void MainWindow::slot_checkbox_dirAsDate_clicked(void)
+{
+    bool checked = false;
+    checked = ui->checkBox_dirAsDate->isChecked();
+    ui->radioBtn_dirAsY->setEnabled(checked);
+    ui->radioBtn_dirAsYM->setEnabled(checked);
+    ui->radioBtn_dirAsYMD->setEnabled(checked);
+}

@@ -49,6 +49,7 @@ private slots:
     void slot_button_import_clicked(void);
     void slot_button_quit_clicked(void);
     void slot_show_dialog(QString);
+    void slot_checkbox_dirAsDate_clicked(void);
 };
 
 #endif // MAINWINDOW_H
