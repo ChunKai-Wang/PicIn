@@ -489,10 +489,10 @@ QFileInfoList PicIn_Core::get_file_list(
 // ****************************************************************************
 
 /*
- * name : slot_set_flagCancel_true
+ * name : setFlagCancel_true
  * desc : Set m_flagCancel to true
  */
-void PicIn_Core::slot_set_flagCancel_true(void)
+void PicIn_Core::setFlagCancel_true(void)
 {
     PicIn_Core::m_flagCancel = true;
 }

@@ -26,6 +26,7 @@ public:
     QDate getExifDate(QString path);
     int getBlEndInt32(char bl, u_int8_t *buf, int len);
     void setFlagDir(bool year, bool month, bool day);
+    void setFlagCancel_true();
 
 private:
 
@@ -51,7 +52,6 @@ signals:
     void signal_update_progress(int);
 
 public slots:
-    void slot_set_flagCancel_true();
 
 };
 

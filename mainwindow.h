@@ -41,6 +41,7 @@ public slots:
     void slot_enable_window(void);
     void slot_disable_window(void);
     void slot_import();
+    void slot_import_canceled();
 
 private slots:
     void slot_button_browse_source_clicked(void);

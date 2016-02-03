@@ -48,7 +48,7 @@ void MainWindow::slot_import()
     dialogImportProgress->ui->progressBar->setValue(0);
     dialogImportProgress->show();
 
-    connect(dialogImportProgress, SIGNAL(rejected()), m_picInCore, SLOT(slot_set_flagCancel_true()));
+    connect(dialogImportProgress, SIGNAL(rejected()), this, SLOT(slot_import_canceled()));
     connect(m_picInCore, SIGNAL(signal_update_progress(int)), dialogImportProgress->ui->progressBar, SLOT(setValue(int)));
 
     //
@@ -64,6 +64,16 @@ void MainWindow::slot_import()
     dialogImportProgress->close();
 
     emit this->signal_enalbe_window();
+}
+
+
+/*
+ * name : slot_enable_window
+ * desc : Enable window
+ */
+void MainWindow::slot_import_canceled(void)
+{
+    m_picInCore->setFlagCancel_true();
 }
 
 /*
