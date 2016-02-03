@@ -100,7 +100,7 @@ void MainWindow::slot_button_browse_source_clicked(void)
     dirPath = fileDialog.getExistingDirectory(
                   this,
                   tr("choose directory"),
-                  "/home/",
+                  "",
                   QFileDialog::ShowDirsOnly |
                   QFileDialog::DontResolveSymlinks |
                   QFileDialog::DontUseCustomDirectoryIcons);
@@ -122,7 +122,7 @@ void MainWindow::slot_button_browse_target_clicked(void)
     dirPath = fileDialog.getExistingDirectory(
                   this,
                   tr("choose directory"),
-                  "/home/",
+                  "",
                   QFileDialog::ShowDirsOnly |
                   QFileDialog::DontResolveSymlinks |
                   QFileDialog::DontUseCustomDirectoryIcons);

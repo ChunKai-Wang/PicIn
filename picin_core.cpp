@@ -3,6 +3,9 @@
 PicIn_Core::PicIn_Core()
 {
     m_flagCancel = false;
+    m_flagDirYear = false;
+    m_flagDirMon = false;
+    m_flagDirDay = false;
     m_numFiles = 0;
 }
 
@@ -106,24 +109,84 @@ int PicIn_Core::set_path(QString path, PicIn_Core::PathType pt)
 void PicIn_Core::import_doit()
 {
     QFile file;
-    QString fileName;
-    QString filePath;
+    QString tgtName;
+    QString tgtPath;
+    QString yearPath;
+    QString monthPath;
+    QString dayPath;
+    QString srcPath;
+    QDate date;
+    QDir dir;
+    bool noExifDate = false;
 
     m_flagCancel = false;
 
-    //If we don;t do this proccessEvents(),
+    //If we don't do this proccessEvents(),
     //progress dialog would no response until this function done.
     QApplication::processEvents(QEventLoop::AllEvents);
     for(int i = 0; i < m_fileInfoList_img.size(); i++){
-        fileName.clear();
-        fileName.append(this->m_fileInfoList_img.at(i).fileName());
+        srcPath = this->m_fileInfoList_img.at(i).absoluteFilePath();
 
-        filePath.clear();
-        filePath.append(m_path_target);
-        filePath.append(fileName);
-        if(!file.exists(filePath)){
-            file.copy(this->m_fileInfoList_img.at(i).absoluteFilePath(), filePath);
+        tgtName.clear();
+        tgtName.append(this->m_fileInfoList_img.at(i).fileName());
+
+        tgtPath.clear();
+        tgtPath.append(m_path_target);
+
+        //
+        // Check whether need to separate pics to folders as date
+        //
+
+        date = getExifDate(srcPath);
+        if(!date.isValid()){
+            date = this->m_fileInfoList_img.at(i).lastModified().date();
+            noExifDate = true;
         }
+
+        yearPath.clear();
+        monthPath.clear();
+        dayPath.clear();
+        if(m_flagDirYear){
+            yearPath.sprintf("/%04d/", date.year());
+            tgtPath.append(yearPath);
+            if(!dir.exists(tgtPath)){
+                dir.mkdir(tgtPath);
+            }
+        }
+        if(m_flagDirMon){
+            monthPath.sprintf("/%02d/", date.month());
+            tgtPath.append(monthPath);
+            if(!dir.exists(tgtPath)){
+                dir.mkdir(tgtPath);
+            }
+        }
+        if(m_flagDirDay){
+            dayPath.sprintf("/%02d/", date.day());
+            tgtPath.append(dayPath);
+            if(!dir.exists(tgtPath)){
+                dir.mkdir(tgtPath);
+            }
+        }
+        if(noExifDate && (m_flagDirYear || m_flagDirMon || m_flagDirDay)){
+            tgtPath.append("/noExifDate/");
+            if(!dir.exists(tgtPath)){
+                dir.mkdir(tgtPath);
+            }
+        }
+
+        //
+        // Copy file
+        //
+
+        tgtPath.append(tgtName);
+        if(!file.exists(tgtPath)){
+            file.copy(srcPath, tgtPath);
+        }
+
+        //
+        // Update progress bar and check cancel
+        //
+
         emit signal_update_progress(i);
         if(m_flagCancel){
             break;
@@ -133,6 +196,235 @@ void PicIn_Core::import_doit()
     }
 
     m_flagCancel = false;
+}
+
+/*
+ * name : getExifDate
+ * desc : get date time info from indicated file's exif
+ */
+QDate PicIn_Core::getExifDate(QString path)
+{
+    QFile file(path);
+    int y = 0;
+    int m = 0;
+    int d = 0;
+
+    char blEnd = 'l';
+
+    u_int8_t buf[4096];
+
+    u_int16_t offset_ffe1 = 0;
+    u_int16_t offset_lenOfFfe1 = 0;
+
+    u_int16_t offset_ffe0 = 0;
+    u_int16_t offset_lenOfFfe0 = 0;
+    u_int16_t len_ffe0 = 0;
+
+    u_int16_t offset_exifHeader = 0;
+    u_int16_t offset_tiffHeader = 0;
+
+    u_int32_t offset_exifSubIfd = 0;
+
+    u_int32_t offset_numOfIfd0Entry = 0;
+    u_int16_t numOfIfdEntry = 0;
+
+    IfdEntry *ifdEntry = NULL;
+
+    u_int32_t offset_orgDate = 0;
+
+    int i = 0;
+    int multiplier = 0;
+
+    //
+    // Start
+    //
+
+    file.open(QIODevice::ReadOnly);
+
+    file.read((char *)buf, 4096);
+
+    //
+    // Check 0xFFD8(Start Of Image)
+    //
+
+    if(buf[0] != 0xff && buf[1] != 0xd8){
+        goto errout;
+    }
+
+    //
+    // Check 0xFFE1, APP1 marker for exif
+    //
+
+    if(buf[2] == 0xff){
+        if(buf[3] == 0xe1){
+
+            //
+            // Found 0xFFE1, the APP1, exif marker.
+            //
+
+            offset_ffe1 = 2;
+        }
+        else if(buf[3] == 0xe0){
+
+            //
+            // Found 0xFFE0, APP0, JFIF marker,
+            // the next marker should be 0xFFE1 APP1, the exif marker what we want.
+            //
+
+            offset_ffe0 = 2;
+            offset_lenOfFfe0 = offset_ffe0 + 2;
+            len_ffe0 = buf[offset_lenOfFfe0] * 0x10 + buf[offset_lenOfFfe0 + 1];
+
+            if(buf[offset_lenOfFfe0 + len_ffe0] == 0xff && buf[offset_lenOfFfe0 + len_ffe0 + 1] == 0xe1){
+                offset_ffe1 = offset_lenOfFfe0 + len_ffe0 + 2;
+            }
+            else{
+                goto errout;
+            }
+        }
+        else{
+            goto errout;
+        }
+    }
+    else{
+        goto errout;
+    }
+
+    offset_lenOfFfe1 = offset_ffe1 + 2;
+    offset_exifHeader = offset_lenOfFfe1 + 2;
+    offset_tiffHeader = offset_exifHeader + 6;
+
+    //
+    // Check tiff header
+    //
+
+    if(buf[offset_tiffHeader] == 0x49 && buf[offset_tiffHeader + 1] == 0x49){
+        // little endian, 0x0A0B0C0D will be [0]:0x0D,[1]:0x0C,[2]:0x0B,[3]:0x0A
+        blEnd = 'l';
+    }
+    else if(buf[offset_tiffHeader] == 0x4d && buf[offset_tiffHeader + 1] == 0x4d){
+        // big endian, 0x0A0B0C0D will be [0]:0x0A,[1]:0x0B,[2]:0x0C,[3]:0x0D
+        blEnd = 'b';
+    }
+    else{
+        goto errout;
+    }
+
+    //
+    // Search tag number 0x8769 for offset of exif sub ifd
+    //
+
+    offset_numOfIfd0Entry = offset_tiffHeader + 8;
+    numOfIfdEntry =  getBlEndInt32(blEnd, (u_int8_t *)&buf[offset_numOfIfd0Entry], 2);
+    ifdEntry = (IfdEntry *) &buf[offset_numOfIfd0Entry + 2];
+
+    for(i = 0; i < numOfIfdEntry; i++)
+    {
+        if(getBlEndInt32(blEnd, (u_int8_t *)&(ifdEntry->tagNum), 2) == 0x8769){
+            // found Exif Sub IFD
+            offset_exifSubIfd = getBlEndInt32(blEnd, (u_int8_t *)&(ifdEntry->data), 4);
+            offset_exifSubIfd += offset_tiffHeader;
+            break;
+        }
+        ifdEntry++;
+    }
+    if(i == numOfIfdEntry){
+        goto errout;
+    }
+
+    //
+    // Search tag number 0x9003 from exif sub ifd to get original date
+    //
+
+    numOfIfdEntry = getBlEndInt32(blEnd, (u_int8_t *)&(buf[offset_exifSubIfd]), 2);
+    ifdEntry = (IfdEntry *)&buf[offset_exifSubIfd + 2];
+
+    for(i = 0; i < numOfIfdEntry; i++)
+    {
+        if(getBlEndInt32(blEnd, (u_int8_t *)&(ifdEntry->tagNum), 2) == 0x9003){
+            // original date
+            offset_orgDate = getBlEndInt32(blEnd, (u_int8_t *)&(ifdEntry->data), 4);
+            offset_orgDate += offset_tiffHeader;
+            break;
+        }
+        ifdEntry++;
+    }
+    if(i == numOfIfdEntry){
+        goto errout;
+    }
+
+    //
+    // Get original date
+    // format : YYYY:MM:DD
+    //
+
+    // year
+    multiplier = 1000;
+    for(i = 0; i < 4; i++){
+        y += (buf[offset_orgDate + 0 + i] - 0x30) * multiplier;
+        multiplier /= 10;
+    }
+
+    // month
+    multiplier = 10;
+    for(i = 0; i < 2; i++){
+        m += (buf[offset_orgDate + 5 + i] - 0x30) * multiplier;
+        multiplier /= 10;
+    }
+
+    // day
+    multiplier = 10;
+    for(i = 0; i < 2; i++){
+        d += (buf[offset_orgDate + 8 + i] - 0x30) * multiplier;
+        multiplier /= 10;
+    }
+
+
+errout:
+    file.close();
+    return QDate(y, m, d);
+}
+
+/*
+ * name : getBlEndInt32
+ * desc : Convet a serial of uint8 buffer to int as big/little endian,
+ *        maximum length is 32bit
+ * in   :
+ *   bl, 'b' for big endian, 'l' for little endian
+ *   *buf, pointer of buffer
+ *   len, length of buffer
+ * ret  : Convert result
+ */
+int PicIn_Core::getBlEndInt32(char bl, u_int8_t *buf, int len)
+{
+    int temp = 0;
+
+    if(bl == 'b'){
+        for(int i = 1; i <= len; i++){
+            temp += buf[i - 1] << ((len - i) * 8);
+        }
+    }
+    else if (bl == 'l'){
+        for(int i = 0; i < len; i++){
+            temp += buf[i] << i * 8;
+        }
+    }
+    return temp;
+}
+
+/*
+ * name : setFlagDir
+ * desc : Set flag to decide whether separate pics to different dir as date
+ * in   :
+ *   year, Separate pics as year
+ *   month, Separate pics as month
+ *   day, Separate pics as day
+ */
+void PicIn_Core::setFlagDir(bool year, bool month, bool day)
+{
+    m_flagDirYear = year;
+    m_flagDirMon = month;
+    m_flagDirDay = day;
 }
 
 // ****************************************************************************

@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <QFileInfoList>
 #include <QDir>
+#include <QDate>
 
 class PicIn_Core : public QObject
 {
@@ -22,14 +23,28 @@ public:
     int getNumFilesSrc(void);
     int set_path(QString source, PathType pt);
     void import_doit();
+    QDate getExifDate(QString path);
+    int getBlEndInt32(char bl, u_int8_t *buf, int len);
+    void setFlagDir(bool year, bool month, bool day);
 
 private:
+
+    typedef struct{
+        u_int8_t tagNum[2];
+        u_int8_t dataFmt[2];
+        u_int8_t numOfComponent[4];
+        u_int8_t data[4];
+    }IfdEntry;
+
     QFileInfoList get_file_list(QString path, QStringList filters);
 
     QFileInfoList m_fileInfoList_img;
     QString m_path_source;
     QString m_path_target;
     bool m_flagCancel;
+    bool m_flagDirYear;
+    bool m_flagDirMon;
+    bool m_flagDirDay;
     int m_numFiles;
 
 signals:
