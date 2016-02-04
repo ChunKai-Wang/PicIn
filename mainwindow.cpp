@@ -89,6 +89,8 @@ void MainWindow::slot_import()
     // done.
     //
 
+    dialogImportProgress->close();
+
     emit this->signal_enalbe_window();
 }
 
