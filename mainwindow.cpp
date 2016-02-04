@@ -286,4 +286,16 @@ void MainWindow::slot_checkbox_dirAsDate_clicked(void)
     ui->radioBtn_dirAsY->setEnabled(checked);
     ui->radioBtn_dirAsYM->setEnabled(checked);
     ui->radioBtn_dirAsYMD->setEnabled(checked);
+
+    //
+    // Set year to default
+    //
+
+    if(checked &&
+       !ui->radioBtn_dirAsY->isChecked() &&
+       !ui->radioBtn_dirAsYM->isChecked() &&
+       !ui->radioBtn_dirAsYMD->isChecked())
+    {
+        ui->radioBtn_dirAsY->setChecked(true);
+    }
 }
