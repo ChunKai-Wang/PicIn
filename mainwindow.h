@@ -31,6 +31,7 @@ public:
 private:
     Ui::MainWindow *ui;
     PicIn_Core *m_picInCore;
+    bool m_flagImportCancel;
 
 signals:
     void signal_show_dialog(QString);

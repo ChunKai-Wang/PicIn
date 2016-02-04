@@ -12,8 +12,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->radioBtn_dirAsYM->setEnabled(false);
     ui->radioBtn_dirAsYMD->setEnabled(false);
 
-    //declare PicIn_core
+    //Initialize variables
     m_picInCore = new PicIn_Core;
+    m_flagImportCancel = false;
 
     //connect
     connect(ui->button_quit, SIGNAL(clicked(bool)), this, SLOT(slot_button_quit_clicked()));
@@ -50,6 +51,7 @@ void MainWindow::slot_import()
     Dialog_Import_Progress *dialogImportProgress = new Dialog_Import_Progress(0);
     dialogImportProgress->setParent(0);
     dialogImportProgress->setAttribute(Qt::WA_DeleteOnClose);
+    dialogImportProgress->setModal(true);
     dialogImportProgress->setWindowTitle(tr(" "));
     dialogImportProgress->ui->progressBar->setRange(0, m_picInCore->getNumFilesSrc());
     dialogImportProgress->ui->progressBar->setValue(0);
@@ -83,13 +85,17 @@ void MainWindow::slot_import()
     else{
         m_picInCore->setFlagDir(false, false, false);
     }
+
     m_picInCore->import_doit();
 
     //
     // done.
     //
 
-    dialogImportProgress->close();
+    if(!m_flagImportCancel){
+        dialogImportProgress->close();
+    }
+    m_flagImportCancel = false;
 
     emit this->signal_enalbe_window();
 }
@@ -102,6 +108,7 @@ void MainWindow::slot_import()
 void MainWindow::slot_import_canceled(void)
 {
     m_picInCore->setFlagCancel_true();
+    m_flagImportCancel = true;
 }
 
 /*
