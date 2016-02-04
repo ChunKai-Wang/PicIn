@@ -55,7 +55,7 @@ void MainWindow::slot_import()
     dialogImportProgress->ui->progressBar->setValue(0);
     dialogImportProgress->show();
 
-    connect(dialogImportProgress->ui->button_cancel, SIGNAL(clicked(bool)), this, SLOT(slot_import_canceled()));
+    connect(dialogImportProgress, SIGNAL(rejected()), this, SLOT(slot_import_canceled()));
     connect(m_picInCore, SIGNAL(signal_update_progress(int)), dialogImportProgress->ui->progressBar, SLOT(setValue(int)));
 
     //
