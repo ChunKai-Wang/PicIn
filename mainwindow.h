@@ -35,12 +35,8 @@ private:
 
 signals:
     void signal_show_dialog(QString);
-    void signal_enalbe_window(void);
-    void signal_disable_window(void);
 
 public slots:
-    void slot_enable_window(void);
-    void slot_disable_window(void);
     void slot_import();
     void slot_import_canceled();
 

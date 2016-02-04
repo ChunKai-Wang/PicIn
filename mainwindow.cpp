@@ -22,8 +22,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->button_browse_target, SIGNAL(clicked(bool)), this, SLOT(slot_button_browse_target_clicked()));
     connect(ui->button_import, SIGNAL(clicked(bool)), this, SLOT(slot_button_import_clicked()));
     connect(this, SIGNAL(signal_show_dialog(QString)), this, SLOT(slot_show_dialog(QString)));
-    connect(this, SIGNAL(signal_enalbe_window()), this, SLOT(slot_enable_window()));
-    connect(this, SIGNAL(signal_disable_window()), this, SLOT(slot_disable_window()));
     connect(ui->checkBox_dirAsDate, SIGNAL(clicked(bool)), this, SLOT(slot_checkbox_dirAsDate_clicked()));
 }
 
@@ -42,8 +40,6 @@ MainWindow::~MainWindow()
  */
 void MainWindow::slot_import()
 {
-    emit this->signal_disable_window();
-
     //
     // Prepare progress bar
     //
@@ -96,37 +92,16 @@ void MainWindow::slot_import()
         dialogImportProgress->close();
     }
     m_flagImportCancel = false;
-
-    emit this->signal_enalbe_window();
 }
 
-
 /*
- * name : slot_enable_window
- * desc : Enable window
+ * name : slot_import_canceled
+ * desc : Cancel button be clicked during importing
  */
 void MainWindow::slot_import_canceled(void)
 {
     m_picInCore->setFlagCancel_true();
     m_flagImportCancel = true;
-}
-
-/*
- * name : slot_enable_window
- * desc : Enable window
- */
-void MainWindow::slot_enable_window(void)
-{
-    MainWindow::setEnabled(true);
-}
-
-/*
- * name : slot_disable_window
- * desc : Disable window
- */
-void MainWindow::slot_disable_window(void)
-{
-    MainWindow::setEnabled(false);
 }
 
 // ****************************************************************************
@@ -240,16 +215,14 @@ void MainWindow::slot_button_import_clicked(void)
     QString fileNum;
     fileNum.sprintf("%d files will imported", numPic);
 
-    emit signal_disable_window();
-
     DialogImportChecker *dialogImportChecker = new DialogImportChecker(0);
     dialogImportChecker->setParent(0);
+    dialogImportChecker->setModal(true);
     dialogImportChecker->ui->label_sts->setText(fileNum);
     dialogImportChecker->setWindowTitle(tr(" "));
     dialogImportChecker->show();
 
     dialogImportChecker->setAttribute(Qt::WA_DeleteOnClose);
-    connect(dialogImportChecker, SIGNAL(rejected()), this, SLOT(slot_enable_window()));
     connect(dialogImportChecker, SIGNAL(accepted()), this, SLOT(slot_import()));
 }
 
@@ -265,14 +238,11 @@ void MainWindow::slot_show_dialog(QString infoToShow)
     dialogInvalidPath->setParent(0);
     dialogInvalidPath->set_label_text(infoToShow);
     dialogInvalidPath->window()->setWindowTitle(" ");
+    dialogInvalidPath->setModal(true);
     dialogInvalidPath->show();
-
-    //Disable main window
-    emit signal_disable_window();
 
     //Enable main window once dialog been closed
     dialogInvalidPath->setAttribute(Qt::WA_DeleteOnClose);
-    connect(dialogInvalidPath, SIGNAL(destroyed(QObject*)), this, SLOT(slot_enable_window()));
 }
 
 /*
