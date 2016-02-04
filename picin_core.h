@@ -5,6 +5,7 @@
 #include <QFileInfoList>
 #include <QDir>
 #include <QDate>
+#include <QProcess>
 
 class PicIn_Core : public QObject
 {
@@ -32,6 +33,7 @@ public:
     int getBlEndInt32(char bl, u_int8_t *buf, int len);
     void setFlagDir(bool year, bool month, bool day);
     void setFlagCancel_true();
+    void setLastModifyDateTime(QString path, QDate date, QTime time);
 
 private:
 
@@ -53,6 +55,7 @@ private:
     bool m_flagDirDay;
     int m_numFiles;
     int m_os;
+    QProcess m_process;
 
 signals:
     void signal_update_progress(int);

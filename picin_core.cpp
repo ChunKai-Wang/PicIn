@@ -116,6 +116,30 @@ int PicIn_Core::set_path(QString path, PicIn_Core::PathType pt)
 }
 
 /*
+ * name : setLastModifyDateTime
+ * desc : Set indicated file's last modified time
+ */
+void PicIn_Core::setLastModifyDateTime(QString path, QDate date, QTime time)
+{
+    if(m_os == OS_LINUX){
+        QString cmd;
+        cmd.sprintf("touch -t %04d%02d%02d%02d%02d ",
+                    date.year(),
+                    date.month(),
+                    date.day(),
+                    time.hour(),
+                    time.minute());
+        cmd.append(path);
+
+        m_process.start(cmd);
+        while(m_process.state() != QProcess::NotRunning){
+            QApplication::processEvents(QEventLoop::AllEvents);
+        }
+    }
+
+}
+
+/*
  * name : impport_doit
  * desc : Do import
  */
@@ -194,6 +218,10 @@ void PicIn_Core::import_doit()
         tgtPath.append(tgtName);
         if(!file.exists(tgtPath)){
             file.copy(srcPath, tgtPath);
+            setLastModifyDateTime(
+                tgtPath,
+                m_fileInfoList_img.at(i).lastModified().date(),
+                m_fileInfoList_img.at(i).lastModified().time());
         }
 
         //
