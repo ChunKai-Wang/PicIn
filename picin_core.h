@@ -17,6 +17,11 @@ public:
         PT_Target = 1
     };
 
+    enum OsType{
+        OS_LINUX = 0,
+        OS_WIN = 1
+    };
+
     PicIn_Core();
 
     int scanSrcFiles(QStringList filters);
@@ -47,6 +52,7 @@ private:
     bool m_flagDirMon;
     bool m_flagDirDay;
     int m_numFiles;
+    int m_os;
 
 signals:
     void signal_update_progress(int);

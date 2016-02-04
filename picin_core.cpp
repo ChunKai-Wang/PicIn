@@ -7,6 +7,13 @@ PicIn_Core::PicIn_Core()
     m_flagDirMon = false;
     m_flagDirDay = false;
     m_numFiles = 0;
+
+#ifdef Q_OS_LINUX
+    m_os = OS_LINUX;
+#endif
+#ifdef Q_OS_WIN
+    m_os = OS_WIN;
+#endif
 }
 
 // ****************************************************************************
@@ -58,16 +65,22 @@ int PicIn_Core::set_path(QString path, PicIn_Core::PathType pt)
     // Check whether path has forward slash at last char
     //
 
-    QSysInfo sysInfo;
-    QString osVer = sysInfo.kernelType();
-
     QChar lastChar = path.at(path.size() - 1);
-    QChar fSlash = QChar('/');
+    QChar fSlash;
 
-    if(!osVer.compare("linux", Qt::CaseInsensitive)){
-        if(!operator ==(lastChar, fSlash)){
-            path.append("/");
-        }
+    switch(m_os){
+    case OS_LINUX:
+    default:
+        fSlash = QChar('/');
+        break;
+
+    case OS_WIN:
+        fSlash.setRow('\\');
+        break;
+    }
+
+    if(!operator ==(lastChar, fSlash)){
+        path.append(fSlash);
     }
 
     //
@@ -427,6 +440,15 @@ void PicIn_Core::setFlagDir(bool year, bool month, bool day)
     m_flagDirDay = day;
 }
 
+/*
+ * name : setFlagCancel_true
+ * desc : Set m_flagCancel to true
+ */
+void PicIn_Core::setFlagCancel_true(void)
+{
+    PicIn_Core::m_flagCancel = true;
+}
+
 // ****************************************************************************
 // ****                      Private functions:                            ****
 // ****************************************************************************
@@ -487,12 +509,3 @@ QFileInfoList PicIn_Core::get_file_list(
 // ****************************************************************************
 // ****                         Public Slots:                              ****
 // ****************************************************************************
-
-/*
- * name : setFlagCancel_true
- * desc : Set m_flagCancel to true
- */
-void PicIn_Core::setFlagCancel_true(void)
-{
-    PicIn_Core::m_flagCancel = true;
-}
