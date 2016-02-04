@@ -174,6 +174,7 @@ void PicIn_Core::import_doit()
         // Check whether need to separate pics to folders as date
         //
 
+        noExifDate = false;
         date = getExifDate(srcPath);
         if(!date.isValid()){
             date = this->m_fileInfoList_img.at(i).lastModified().date();
