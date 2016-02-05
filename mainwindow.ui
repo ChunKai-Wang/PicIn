@@ -203,6 +203,11 @@
   <tabstop>lineEdit_path_target</tabstop>
   <tabstop>button_browse_source</tabstop>
   <tabstop>button_browse_target</tabstop>
+  <tabstop>checkBox_includeSubDir</tabstop>
+  <tabstop>checkBox_dirAsDate</tabstop>
+  <tabstop>radioBtn_dirAsY</tabstop>
+  <tabstop>radioBtn_dirAsYM</tabstop>
+  <tabstop>radioBtn_dirAsYMD</tabstop>
   <tabstop>button_import</tabstop>
   <tabstop>button_quit</tabstop>
  </tabstops>

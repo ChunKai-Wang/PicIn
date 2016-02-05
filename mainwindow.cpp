@@ -64,6 +64,7 @@ void MainWindow::slot_import()
     dialogImportProgress->setWindowTitle(tr(" "));
     dialogImportProgress->ui->progressBar->setRange(0, m_picInCore->getNumFilesSrc());
     dialogImportProgress->ui->progressBar->setValue(0);
+    dialogImportProgress->ui->progressBar->setFormat("%v/%m");
     dialogImportProgress->show();
 
     connect(dialogImportProgress, SIGNAL(rejected()), this, SLOT(slot_import_canceled()));
