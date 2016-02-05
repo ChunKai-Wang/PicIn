@@ -5,6 +5,7 @@
 #include <QApplication>
 #include <QFileDialog>
 #include <QPushButton>
+#include <QMessageBox>
 
 #include "ui_mainwindow.h"
 #include "dialog_invalid_path.h"
@@ -14,6 +15,8 @@
 #include "ui_dialog_invalid_path.h"
 #include "ui_dialog_import_progress.h"
 #include "picin_core.h"
+
+#define PICIN_VER "V0.1"
 
 namespace Ui {
 class MainWindow;
@@ -46,6 +49,8 @@ private slots:
     void slot_button_quit_clicked(void);
     void slot_show_dialog(QString);
     void slot_checkbox_dirAsDate_clicked(void);
+    void slot_menu_about(void);
+    void slot_menu_aboutQt(void);
 };
 
 #endif // MAINWINDOW_H

@@ -5,12 +5,18 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->setWindowTitle(tr("PicIn"));
+    this->setWindowTitle(tr("PicIn "PICIN_VER));
 
     //Initialize radio buttons
     ui->radioBtn_dirAsY->setEnabled(false);
     ui->radioBtn_dirAsYM->setEnabled(false);
     ui->radioBtn_dirAsYMD->setEnabled(false);
+
+#ifdef Q_OS_WIN
+    ui->radioBtn_dirAsY->setText(tr("Year\\"));
+    ui->radioBtn_dirAsYM->setText(tr("Year\Month\\"));
+    ui->radioBtn_dirAsYMD->setText(tr("Year\Month\Day\\"));
+#endif
 
     //Initialize variables
     m_picInCore = new PicIn_Core;
@@ -23,6 +29,13 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->button_import, SIGNAL(clicked(bool)), this, SLOT(slot_button_import_clicked()));
     connect(this, SIGNAL(signal_show_dialog(QString)), this, SLOT(slot_show_dialog(QString)));
     connect(ui->checkBox_dirAsDate, SIGNAL(clicked(bool)), this, SLOT(slot_checkbox_dirAsDate_clicked()));
+
+    connect(ui->actionAbout, SIGNAL(triggered(bool)), this, SLOT(slot_menu_about()));
+    connect(ui->actionAbout_QT, SIGNAL(triggered(bool)), this, SLOT(slot_menu_aboutQt()));
+    connect(ui->actionSource, SIGNAL(triggered(bool)), this, SLOT(slot_button_browse_source_clicked()));
+    connect(ui->actionTarget, SIGNAL(triggered(bool)), this, SLOT(slot_button_browse_target_clicked()));
+    connect(ui->actionImport, SIGNAL(triggered(bool)), this, SLOT(slot_button_import_clicked()));
+    connect(ui->actionExit, SIGNAL(triggered(bool)), this, SLOT(slot_button_quit_clicked()));
 }
 
 MainWindow::~MainWindow()
@@ -287,4 +300,30 @@ void MainWindow::slot_checkbox_dirAsDate_clicked(void)
     {
         ui->radioBtn_dirAsY->setChecked(true);
     }
+}
+
+/*
+ * name : slot_menu_about
+ * desc : show about info
+ */
+void MainWindow::slot_menu_about(void)
+{
+    QString aboutTitle("About PicIn");
+    QString aboutContent("PicIn "PICIN_VER"\n"
+                         "Copyright (C) 2016, ChunKai-Wang, "
+                         "kaiw1982@gmail.com\n"
+                         "\n"
+                         "PicIn is a tool be created through QT 5.5.1"
+                         " to import pictures from somewhere"
+                         "(usb, sd card, a folder...) to specific location.\n");
+    QMessageBox::about(0, aboutTitle, aboutContent);
+}
+
+/*
+ * name : slot_menu_aboutQt
+ * desc : show about QT info
+ */
+void MainWindow::slot_menu_aboutQt(void)
+{
+    QMessageBox::aboutQt(0);
 }

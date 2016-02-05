@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>572</width>
-    <height>230</height>
+    <height>259</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -53,7 +53,7 @@
       <item row="6" column="3">
        <widget class="QPushButton" name="button_quit">
         <property name="text">
-         <string>quit</string>
+         <string>Exit</string>
         </property>
        </widget>
       </item>
@@ -89,24 +89,30 @@
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout">
+          <property name="leftMargin">
+           <number>6</number>
+          </property>
+          <property name="rightMargin">
+           <number>6</number>
+          </property>
           <item>
            <widget class="QRadioButton" name="radioBtn_dirAsY">
             <property name="text">
-             <string>Year</string>
+             <string>Year/</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QRadioButton" name="radioBtn_dirAsYM">
             <property name="text">
-             <string>Year-Month</string>
+             <string>Year/Month/</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QRadioButton" name="radioBtn_dirAsYMD">
             <property name="text">
-             <string>Year-Month-Day</string>
+             <string>Year/Month/Day/</string>
             </property>
            </widget>
           </item>
@@ -131,18 +137,65 @@
     <property name="title">
      <string>Menu</string>
     </property>
+    <addaction name="actionSource"/>
+    <addaction name="actionTarget"/>
+    <addaction name="actionImport"/>
+    <addaction name="actionExit"/>
+    <addaction name="separator"/>
+    <addaction name="actionAbout"/>
+    <addaction name="actionAbout_QT"/>
    </widget>
    <addaction name="menu_Menu"/>
   </widget>
-  <widget class="QToolBar" name="mainToolBar">
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-  </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionAbout">
+   <property name="text">
+    <string>about</string>
+   </property>
+   <property name="shortcut">
+    <string>F1</string>
+   </property>
+  </action>
+  <action name="actionSource">
+   <property name="text">
+    <string>Source</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionTarget">
+   <property name="text">
+    <string>Target</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionImport">
+   <property name="text">
+    <string>Import</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
+   </property>
+  </action>
+  <action name="actionAbout_QT">
+   <property name="text">
+    <string>about QT</string>
+   </property>
+   <property name="shortcut">
+    <string>F2</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <tabstops>
