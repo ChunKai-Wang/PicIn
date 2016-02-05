@@ -14,7 +14,6 @@
 #include "ui_dialog_invalid_path.h"
 #include "ui_dialog_import_progress.h"
 #include "picin_core.h"
-#include "picin_core.h"
 
 namespace Ui {
 class MainWindow;
