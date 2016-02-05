@@ -65,22 +65,22 @@ int PicIn_Core::set_path(QString path, PicIn_Core::PathType pt)
     // Check whether path has forward slash at last char
     //
 
-    QChar lastChar = path.at(path.size() - 1);
-    QChar fSlash;
+    QChar lastChar = path.at(path.size() - 1);;
+    QString slash;
 
     switch(m_os){
     case OS_LINUX:
     default:
-        fSlash = QChar('/');
+        slash.sprintf("%s", "/");
         break;
 
     case OS_WIN:
-        fSlash.setRow('\\');
+        slash.sprintf("%s", "\\");
         break;
     }
 
-    if(!operator ==(lastChar, fSlash)){
-        path.append(fSlash);
+    if(!operator ==(lastChar, slash.at(0))){
+        path.append(slash);
     }
 
     //

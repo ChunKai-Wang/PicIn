@@ -116,6 +116,7 @@ void MainWindow::slot_button_browse_source_clicked(void)
 {
     QFileDialog fileDialog;
     QString dirPath;
+    QDir dir;
 
     dirPath = fileDialog.getExistingDirectory(
                   this,
@@ -125,6 +126,7 @@ void MainWindow::slot_button_browse_source_clicked(void)
                   QFileDialog::DontResolveSymlinks |
                   QFileDialog::DontUseCustomDirectoryIcons);
 
+    dirPath = dir.toNativeSeparators(dirPath);
     if(!dirPath.isNull()){
         ui->lineEdit_path_source->setText(dirPath);
     }
@@ -138,6 +140,7 @@ void MainWindow::slot_button_browse_target_clicked(void)
 {
     QFileDialog fileDialog;
     QString dirPath;
+    QDir dir;
 
     dirPath = fileDialog.getExistingDirectory(
                   this,
@@ -147,6 +150,7 @@ void MainWindow::slot_button_browse_target_clicked(void)
                   QFileDialog::DontResolveSymlinks |
                   QFileDialog::DontUseCustomDirectoryIcons);
 
+    dirPath = dir.toNativeSeparators(dirPath);
     if(!dirPath.isNull()){
         ui->lineEdit_path_target->setText(dirPath);
     }
