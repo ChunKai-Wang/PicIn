@@ -38,8 +38,11 @@ public:
     void import_doit();
     QDate getExifDate(QString path);
     int getBlEndInt32(char bl, u_int8_t *buf, int len);
+
     void setFlagDir(bool year, bool month, bool day);
     void setFlagCancel_true();
+    void setFlagSubDir(bool flag);
+
     void setLastModifyDateTime(QString path, QDate date, QTime time);
 
 private:
@@ -56,10 +59,13 @@ private:
     QFileInfoList m_fileInfoList_img;
     QString m_path_source;
     QString m_path_target;
+
     bool m_flagCancel;
     bool m_flagDirYear;
     bool m_flagDirMon;
     bool m_flagDirDay;
+    bool m_flagSubDir;
+
     int m_numFiles;
     int m_os;
     QProcess m_process;

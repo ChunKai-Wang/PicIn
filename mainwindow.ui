@@ -74,6 +74,13 @@
       <item row="5" column="1">
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
+         <widget class="QCheckBox" name="checkBox_includeSubDir">
+          <property name="text">
+           <string>Include sub folders</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QCheckBox" name="checkBox_dirAsDate">
           <property name="text">
            <string>Import pics to different folder as date</string>

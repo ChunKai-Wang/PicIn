@@ -57,7 +57,7 @@ void MainWindow::slot_import()
     connect(m_picInCore, SIGNAL(signal_update_progress(int)), dialogImportProgress->ui->progressBar, SLOT(setValue(int)));
 
     //
-    // Import files
+    // Set import folder as date flags
     //
 
     if(ui->checkBox_dirAsDate->isChecked()){
@@ -81,6 +81,10 @@ void MainWindow::slot_import()
     else{
         m_picInCore->setFlagDir(false, false, false);
     }
+
+    //
+    // Do import
+    //
 
     m_picInCore->import_doit();
 
@@ -205,6 +209,8 @@ void MainWindow::slot_button_import_clicked(void)
 
     nameFilters.append(tr("*.jpg"));
     nameFilters.append(tr("*.jpeg"));
+
+    m_picInCore->setFlagSubDir(ui->checkBox_includeSubDir->isChecked());
 
     numPic = m_picInCore->scanSrcFiles(nameFilters);
     if(numPic <= 0){

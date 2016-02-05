@@ -6,6 +6,7 @@ PicIn_Core::PicIn_Core()
     m_flagDirYear = false;
     m_flagDirMon = false;
     m_flagDirDay = false;
+    m_flagSubDir = false;
     m_numFiles = 0;
 
 #ifdef Q_OS_LINUX
@@ -478,6 +479,15 @@ void PicIn_Core::setFlagCancel_true(void)
     PicIn_Core::m_flagCancel = true;
 }
 
+/*
+ * name : setFlagSubDir
+ * desc : Set value of m_flagSubDir
+ */
+void PicIn_Core::setFlagSubDir(bool flag)
+{
+    PicIn_Core::m_flagSubDir = flag;
+}
+
 // ****************************************************************************
 // ****                      Private functions:                            ****
 // ****************************************************************************
@@ -517,19 +527,21 @@ QFileInfoList PicIn_Core::get_file_list(
     // Scan sub directory
     //
 
-    QFileInfoList dirInfoList;
+    if(m_flagSubDir){
+        QFileInfoList dirInfoList;
 
-    dir.setFilter(QDir::NoSymLinks | QDir::Dirs | QDir::NoDotAndDotDot);
-    nameFilters.clear();
-    dir.setNameFilters(nameFilters);
-    dir.setSorting(QDir::Name);
+        dir.setFilter(QDir::NoSymLinks | QDir::Dirs | QDir::NoDotAndDotDot);
+        nameFilters.clear();
+        dir.setNameFilters(nameFilters);
+        dir.setSorting(QDir::Name);
 
-    dirInfoList = dir.entryInfoList();
+        dirInfoList = dir.entryInfoList();
 
-    for(int i = 0; i < dirInfoList.size(); i++){
-        fileInfoList.append(
-            get_file_list(dirInfoList.at(i).absoluteFilePath(),
-            filters));
+        for(int i = 0; i < dirInfoList.size(); i++){
+            fileInfoList.append(
+                get_file_list(dirInfoList.at(i).absoluteFilePath(),
+                filters));
+        }
     }
 
     return fileInfoList;
