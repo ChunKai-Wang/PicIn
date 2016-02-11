@@ -7,6 +7,7 @@ PicIn_Core::PicIn_Core()
     m_flagDirMon = false;
     m_flagDirDay = false;
     m_flagSubDir = false;
+    m_flagOverwrite = false;
     m_numFiles = 0;
 
 #ifdef Q_OS_LINUX
@@ -218,7 +219,7 @@ void PicIn_Core::import_doit()
         //
 
         tgtPath.append(tgtName);
-        if(!file.exists(tgtPath)){
+        if(!file.exists(tgtPath) || m_flagOverwrite){
             file.copy(srcPath, tgtPath);
             setLastModifyDateTime(
                 tgtPath,
@@ -486,6 +487,15 @@ void PicIn_Core::setFlagCancel_true(void)
 void PicIn_Core::setFlagSubDir(bool flag)
 {
     PicIn_Core::m_flagSubDir = flag;
+}
+
+/*
+ * name : setFlagOverwrite
+ * desc : Set value of m_flagOverwrite
+ */
+void PicIn_Core::setFlagOverwrite(bool flag)
+{
+    PicIn_Core::m_flagOverwrite = flag;
 }
 
 // ****************************************************************************

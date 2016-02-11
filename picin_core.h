@@ -42,6 +42,7 @@ public:
     void setFlagDir(bool year, bool month, bool day);
     void setFlagCancel_true();
     void setFlagSubDir(bool flag);
+    void setFlagOverwrite(bool flag);
 
     void setLastModifyDateTime(QString path, QDate date, QTime time);
 
@@ -65,6 +66,7 @@ private:
     bool m_flagDirMon;
     bool m_flagDirDay;
     bool m_flagSubDir;
+    bool m_flagOverwrite;
 
     int m_numFiles;
     int m_os;

@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
 #ifdef Q_OS_WIN
     ui->radioBtn_dirAsY->setText(tr("Year\\"));
     ui->radioBtn_dirAsYM->setText(tr("Year\\Month\\"));
-    ui->radioBtn_dirAsYMD->setText(tr("Year\\Month\Day\\"));
+    ui->radioBtn_dirAsYMD->setText(tr("Year\\Month\\Day\\"));
 #endif
 
     //Initialize variables
@@ -240,6 +240,12 @@ void MainWindow::slot_button_import_clicked(void)
         emit signal_show_dialog("File not found");
         return;
     }
+
+    //
+    // Set overwrite flag
+    //
+
+    m_picInCore->setFlagOverwrite(ui->checkBox_overwt->isChecked());
 
     //
     // Confirmation for importing
