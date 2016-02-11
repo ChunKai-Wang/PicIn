@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>572</width>
-    <height>259</height>
+    <width>560</width>
+    <height>370</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,105 +22,115 @@
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_source">
-        <property name="text">
-         <string>Source</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="lineEdit_path_source"/>
-      </item>
-      <item row="1" column="3">
-       <widget class="QPushButton" name="button_browse_source">
-        <property name="text">
-         <string>browse</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QLineEdit" name="lineEdit_path_target"/>
-      </item>
-      <item row="3" column="3">
-       <widget class="QPushButton" name="button_browse_target">
-        <property name="text">
-         <string>browse</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="3">
-       <widget class="QPushButton" name="button_quit">
-        <property name="text">
-         <string>Exit</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_target">
-        <property name="text">
-         <string>Target</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="3">
-       <widget class="QPushButton" name="button_import">
-        <property name="text">
-         <string>import</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="1">
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <widget class="QCheckBox" name="checkBox_includeSubDir">
-          <property name="text">
-           <string>Include sub folders</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="checkBox_dirAsDate">
-          <property name="text">
-           <string>Import pics to different folder as date</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout">
-          <property name="leftMargin">
-           <number>6</number>
-          </property>
-          <property name="rightMargin">
-           <number>6</number>
-          </property>
-          <item>
-           <widget class="QRadioButton" name="radioBtn_dirAsY">
-            <property name="text">
-             <string>Year/</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="radioBtn_dirAsYM">
-            <property name="text">
-             <string>Year/Month/</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="radioBtn_dirAsYMD">
-            <property name="text">
-             <string>Year/Month/Day/</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </item>
-     </layout>
+     <widget class="QGroupBox" name="groupBox_filePath">
+      <property name="title">
+       <string>File path</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_source">
+         <property name="text">
+          <string>Source</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QPushButton" name="button_browse_source">
+         <property name="text">
+          <string>browse</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="lineEdit_path_source"/>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_target">
+         <property name="text">
+          <string>Target</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="lineEdit_path_target"/>
+       </item>
+       <item row="1" column="2">
+        <widget class="QPushButton" name="button_browse_target">
+         <property name="text">
+          <string>browse</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox_config">
+      <property name="title">
+       <string>Config</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="checkBox_dirAsDate">
+         <property name="text">
+          <string>Import pics to different folder as date</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QCheckBox" name="checkBox_includeSubDir">
+         <property name="text">
+          <string>Include sub folders</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <property name="leftMargin">
+          <number>6</number>
+         </property>
+         <property name="rightMargin">
+          <number>6</number>
+         </property>
+         <item>
+          <widget class="QRadioButton" name="radioBtn_dirAsY">
+           <property name="text">
+            <string>Year/</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="radioBtn_dirAsYM">
+           <property name="text">
+            <string>Year/Month/</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="radioBtn_dirAsYMD">
+           <property name="text">
+            <string>Year/Month/Day/</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="button_import">
+      <property name="text">
+       <string>import</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="button_quit">
+      <property name="text">
+       <string>Exit</string>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -129,7 +139,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>572</width>
+     <width>560</width>
      <height>22</height>
     </rect>
    </property>
@@ -199,17 +209,8 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <tabstops>
-  <tabstop>lineEdit_path_source</tabstop>
-  <tabstop>lineEdit_path_target</tabstop>
-  <tabstop>button_browse_source</tabstop>
-  <tabstop>button_browse_target</tabstop>
-  <tabstop>checkBox_includeSubDir</tabstop>
-  <tabstop>checkBox_dirAsDate</tabstop>
-  <tabstop>radioBtn_dirAsY</tabstop>
   <tabstop>radioBtn_dirAsYM</tabstop>
   <tabstop>radioBtn_dirAsYMD</tabstop>
-  <tabstop>button_import</tabstop>
-  <tabstop>button_quit</tabstop>
  </tabstops>
  <resources/>
  <connections/>
