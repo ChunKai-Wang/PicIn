@@ -156,7 +156,6 @@ void PicIn_Core::import_doit()
     QString srcPath;
     QDate date;
     QDir dir;
-    bool noExifDate = false;
 
     m_flagCancel = false;
 
@@ -176,11 +175,9 @@ void PicIn_Core::import_doit()
         // Check whether need to separate pics to folders as date
         //
 
-        noExifDate = false;
         date = getExifDate(srcPath);
         if(!date.isValid()){
             date = this->m_fileInfoList_img.at(i).lastModified().date();
-            noExifDate = true;
         }
 
         yearPath.clear();
@@ -203,12 +200,6 @@ void PicIn_Core::import_doit()
         if(m_flagDirDay){
             dayPath.sprintf("/%02d/", date.day());
             tgtPath.append(dayPath);
-            if(!dir.exists(tgtPath)){
-                dir.mkdir(tgtPath);
-            }
-        }
-        if(noExifDate && (m_flagDirYear || m_flagDirMon || m_flagDirDay)){
-            tgtPath.append("/noExifDate/");
             if(!dir.exists(tgtPath)){
                 dir.mkdir(tgtPath);
             }
