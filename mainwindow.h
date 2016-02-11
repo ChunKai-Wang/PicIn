@@ -51,6 +51,7 @@ private slots:
     void slot_checkbox_dirAsDate_clicked(void);
     void slot_menu_about(void);
     void slot_menu_aboutQt(void);
+    void slot_fileFmt_all(bool checked);
 };
 
 #endif // MAINWINDOW_H

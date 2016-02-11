@@ -29,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->button_import, SIGNAL(clicked(bool)), this, SLOT(slot_button_import_clicked()));
     connect(this, SIGNAL(signal_show_dialog(QString)), this, SLOT(slot_show_dialog(QString)));
     connect(ui->checkBox_dirAsDate, SIGNAL(clicked(bool)), this, SLOT(slot_checkbox_dirAsDate_clicked()));
+    connect(ui->checkBox_fileFmt_all, SIGNAL(clicked(bool)), this, SLOT(slot_fileFmt_all(bool)));
 
     connect(ui->actionAbout, SIGNAL(triggered(bool)), this, SLOT(slot_menu_about()));
     connect(ui->actionAbout_QT, SIGNAL(triggered(bool)), this, SLOT(slot_menu_aboutQt()));
@@ -215,7 +216,7 @@ void MainWindow::slot_button_import_clicked(void)
     }
 
     //
-    // Get file list
+    // Set file name filter
     //
 
     QStringList nameFilters;
@@ -229,9 +230,41 @@ void MainWindow::slot_button_import_clicked(void)
         nameFilters.append(tr("*.tif"));
         nameFilters.append(tr("*.tiff"));
     }
+    if(ui->checkBox_fileFmt_gif->isChecked()){
+        nameFilters.append(tr("*.gif"));
+    }
+    if(ui->checkBox_fileFmt_bmp->isChecked()){
+        nameFilters.append(tr("*.bmp"));
+    }
+    if(ui->checkBox_fileFmt_png->isChecked()){
+        nameFilters.append(tr("*.png"));
+    }
     if(ui->checkBox_fileFmt_mov->isChecked()){
         nameFilters.append(tr("*.mov"));
     }
+    if(ui->checkBox_fileFmt_avi->isChecked()){
+        nameFilters.append(tr("*.avi"));
+    }
+    if(ui->checkBox_fileFmt_mpg->isChecked()){
+        nameFilters.append(tr("*.mpg"));
+        nameFilters.append(tr("*.mpeg"));
+    }
+    if(ui->checkBox_fileFmt_m4v->isChecked()){
+        nameFilters.append(tr("*.m4v"));
+    }
+    if(ui->checkBox_fileFmt_mkv->isChecked()){
+        nameFilters.append(tr("*.mkv"));
+    }
+    if(ui->checkBox_fileFmt_divx->isChecked()){
+        nameFilters.append(tr("*.divx"));
+    }
+    if(ui->checkBox_fileFmt_mkv->isChecked()){
+        nameFilters.append(tr("*.mp4"));
+    }
+
+    //
+    // Get file list
+    //
 
     m_picInCore->setFlagSubDir(ui->checkBox_includeSubDir->isChecked());
 
@@ -342,4 +375,24 @@ void MainWindow::slot_menu_about(void)
 void MainWindow::slot_menu_aboutQt(void)
 {
     QMessageBox::aboutQt(0);
+}
+
+/*
+ * name : slot_fileFmt_all
+ * desc : Change all fileFmt checkboxes status
+ */
+void MainWindow::slot_fileFmt_all(bool checked)
+{
+    ui->checkBox_fileFmt_avi->setChecked(checked);
+    ui->checkBox_fileFmt_bmp->setChecked(checked);
+    ui->checkBox_fileFmt_divx->setChecked(checked);
+    ui->checkBox_fileFmt_gif->setChecked(checked);
+    ui->checkBox_fileFmt_jpg->setChecked(checked);
+    ui->checkBox_fileFmt_m4v->setChecked(checked);
+    ui->checkBox_fileFmt_mkv->setChecked(checked);
+    ui->checkBox_fileFmt_mov->setChecked(checked);
+    ui->checkBox_fileFmt_mp4->setChecked(checked);
+    ui->checkBox_fileFmt_mpg->setChecked(checked);
+    ui->checkBox_fileFmt_png->setChecked(checked);
+    ui->checkBox_fileFmt_tif->setChecked(checked);
 }
