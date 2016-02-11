@@ -221,14 +221,23 @@ void MainWindow::slot_button_import_clicked(void)
     QStringList nameFilters;
     int numPic = 0;
 
-    nameFilters.append(tr("*.jpg"));
-    nameFilters.append(tr("*.jpeg"));
+    if(ui->checkBox_fileFmt_jpg->isChecked()){
+        nameFilters.append(tr("*.jpg"));
+        nameFilters.append(tr("*.jpeg"));
+    }
+    if(ui->checkBox_fileFmt_tif->isChecked()){
+        nameFilters.append(tr("*.tif"));
+        nameFilters.append(tr("*.tiff"));
+    }
+    if(ui->checkBox_fileFmt_mov->isChecked()){
+        nameFilters.append(tr("*.mov"));
+    }
 
     m_picInCore->setFlagSubDir(ui->checkBox_includeSubDir->isChecked());
 
     numPic = m_picInCore->scanSrcFiles(nameFilters);
     if(numPic <= 0){
-        emit signal_show_dialog("No Pictures");
+        emit signal_show_dialog("File not found");
         return;
     }
 

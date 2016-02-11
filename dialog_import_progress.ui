@@ -21,7 +21,7 @@
      </property>
     </widget>
    </item>
-   <item>
+   <item alignment="Qt::AlignHCenter">
     <widget class="QPushButton" name="button_cancel">
      <property name="text">
       <string>Cancel</string>

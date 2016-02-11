@@ -24,7 +24,7 @@
      </property>
     </widget>
    </item>
-   <item>
+   <item alignment="Qt::AlignHCenter">
     <widget class="QPushButton" name="button_invalid_path_ok">
      <property name="text">
       <string>OK</string>

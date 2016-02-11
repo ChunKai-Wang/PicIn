@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>560</width>
-    <height>370</height>
+    <width>530</width>
+    <height>460</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -65,6 +65,39 @@
      </widget>
     </item>
     <item>
+     <widget class="QGroupBox" name="groupBox_fileFmt">
+      <property name="title">
+       <string>File format</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="1" column="0" alignment="Qt::AlignLeft">
+        <widget class="QCheckBox" name="checkBox_fileFmt_tif">
+         <property name="text">
+          <string>TIF/TIFF</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" alignment="Qt::AlignLeft">
+        <widget class="QCheckBox" name="checkBox_fileFmt_jpg">
+         <property name="text">
+          <string>JPG/JPEG</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1" alignment="Qt::AlignLeft">
+        <widget class="QCheckBox" name="checkBox_fileFmt_mov">
+         <property name="text">
+          <string>MOV</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
      <widget class="QGroupBox" name="groupBox_config">
       <property name="title">
        <string>Config</string>
@@ -72,6 +105,9 @@
       <layout class="QGridLayout" name="gridLayout_3">
        <item row="1" column="0">
         <widget class="QCheckBox" name="checkBox_dirAsDate">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Store pictures to different sub directory as when were them taken.&lt;/p&gt;&lt;p&gt;Example, a picture were taken on 2016/01/17,&lt;br/&gt;this option may store the picture to&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;&amp;lt;target path&amp;gt;/2016/&lt;br/&gt;&lt;/span&gt;or&lt;br/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;&amp;lt;target path&amp;gt;/2016/01/&lt;br/&gt;&lt;/span&gt;or&lt;br/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;&amp;lt;target path&amp;gt;/2016/01/17/&lt;/span&gt;&lt;/p&gt;&lt;p&gt;as directory struct choiced.&lt;/p&gt;&lt;p&gt;Currently,&lt;br/&gt;PicIn read &lt;span style=&quot; font-weight:600;&quot;&gt;jpg's exif&lt;/span&gt; to know when are pictures taken,&lt;br/&gt;but use &lt;span style=&quot; font-weight:600;&quot;&gt;&amp;quot;last modified date&amp;quot; for other media format&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Import pics to different folder as date</string>
          </property>
@@ -85,28 +121,28 @@
         </widget>
        </item>
        <item row="2" column="0">
-        <layout class="QHBoxLayout" name="horizontalLayout">
+        <layout class="QHBoxLayout" name="HLayout_dirAsDate">
          <property name="leftMargin">
           <number>6</number>
          </property>
          <property name="rightMargin">
           <number>6</number>
          </property>
-         <item>
+         <item alignment="Qt::AlignLeft">
           <widget class="QRadioButton" name="radioBtn_dirAsY">
            <property name="text">
             <string>Year/</string>
            </property>
           </widget>
          </item>
-         <item>
+         <item alignment="Qt::AlignLeft">
           <widget class="QRadioButton" name="radioBtn_dirAsYM">
            <property name="text">
             <string>Year/Month/</string>
            </property>
           </widget>
          </item>
-         <item>
+         <item alignment="Qt::AlignLeft">
           <widget class="QRadioButton" name="radioBtn_dirAsYMD">
            <property name="text">
             <string>Year/Month/Day/</string>
@@ -119,18 +155,40 @@
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="button_import">
-      <property name="text">
-       <string>import</string>
+     <layout class="QHBoxLayout" name="HLayout_action">
+      <property name="leftMargin">
+       <number>300</number>
       </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="button_quit">
-      <property name="text">
-       <string>Exit</string>
+      <property name="topMargin">
+       <number>6</number>
       </property>
-     </widget>
+      <property name="rightMargin">
+       <number>6</number>
+      </property>
+      <property name="bottomMargin">
+       <number>6</number>
+      </property>
+      <item alignment="Qt::AlignRight">
+       <widget class="QWidget" name="widget_action" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QPushButton" name="button_import">
+           <property name="text">
+            <string>import</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="button_quit">
+           <property name="text">
+            <string>Exit</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>
@@ -139,7 +197,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>560</width>
+     <width>530</width>
      <height>22</height>
     </rect>
    </property>
