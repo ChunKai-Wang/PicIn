@@ -4,19 +4,19 @@
 #include <QDialog>
 
 namespace Ui {
-class dialog_invalid_path;
+class Dialog_Msg;
 }
 
-class dialog_invalid_path : public QDialog
+class Dialog_Msg : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit dialog_invalid_path(QWidget *parent = 0);
-    ~dialog_invalid_path();
+    explicit Dialog_Msg(QWidget *parent = 0);
+    ~Dialog_Msg();
     void set_label_text(QString);
 
-    Ui::dialog_invalid_path *ui;
+    Ui::Dialog_Msg *ui;
 };
 
 #endif // DIALOG_INVALID_PATH_H

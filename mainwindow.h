@@ -8,11 +8,11 @@
 #include <QMessageBox>
 
 #include "ui_mainwindow.h"
-#include "dialog_invalid_path.h"
+#include "dialog_msg.h"
 #include "dialogimportchecker.h"
 #include "dialog_import_progress.h"
 #include "ui_dialogimportchecker.h"
-#include "ui_dialog_invalid_path.h"
+#include "ui_dialog_msg.h"
 #include "ui_dialog_import_progress.h"
 #include "picin_core.h"
 

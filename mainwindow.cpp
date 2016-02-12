@@ -304,17 +304,15 @@ void MainWindow::slot_button_import_clicked(void)
  */
 void MainWindow::slot_show_dialog(QString infoToShow)
 {
-    dialog_invalid_path *dialogInvalidPath = new dialog_invalid_path(0);
+    Dialog_Msg *dialogMsg = new Dialog_Msg(0);
 
     //Show dialog
-    dialogInvalidPath->setParent(0);
-    dialogInvalidPath->set_label_text(infoToShow);
-    dialogInvalidPath->window()->setWindowTitle(" ");
-    dialogInvalidPath->setModal(true);
-    dialogInvalidPath->show();
-
-    //Enable main window once dialog been closed
-    dialogInvalidPath->setAttribute(Qt::WA_DeleteOnClose);
+    dialogMsg->setParent(0);
+    dialogMsg->set_label_text(infoToShow);
+    dialogMsg->window()->setWindowTitle(" ");
+    dialogMsg->setModal(true);
+    dialogMsg->setAttribute(Qt::WA_DeleteOnClose);
+    dialogMsg->exec();
 }
 
 /*
