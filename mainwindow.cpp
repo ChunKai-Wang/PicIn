@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include <QTextStream>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -37,11 +38,227 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionTarget, SIGNAL(triggered(bool)), this, SLOT(slot_button_browse_target_clicked()));
     connect(ui->actionImport, SIGNAL(triggered(bool)), this, SLOT(slot_button_import_clicked()));
     connect(ui->actionExit, SIGNAL(triggered(bool)), this, SLOT(slot_button_quit_clicked()));
+
+    //Read config
+    readCfg();
 }
 
 MainWindow::~MainWindow()
 {
+    updateCfg();
     delete ui;
+}
+
+// ****************************************************************************
+// ****                      Private functions:                            ****
+// ****************************************************************************
+
+/*
+ * name : updateCfg
+ * desc : update text configuration file content
+ */
+void MainWindow::updateCfg(void)
+{
+    QFile cfgFile(tr(".picin.cfg"));
+
+    if(cfgFile.exists()){
+        cfgFile.remove();
+    }
+
+    if(!cfgFile.open(QIODevice::ReadWrite | QIODevice::Text)){
+        return;
+    }
+
+    QTextStream out(&cfgFile);
+
+    //
+    // file path
+    //
+
+    if(ui->lineEdit_path_source->text().length() > 0){
+        out << "source=" << ui->lineEdit_path_source->text() << "\n";
+    }
+    if(ui->lineEdit_path_target->text().length() > 0){
+        out << "target=" << ui->lineEdit_path_target->text() << "\n";
+    }
+
+    //
+    // file format
+    //
+
+    if(ui->checkBox_fileFmt_jpg->isChecked()){
+        out << "fmt_jpg=1\n";
+    }
+    if(ui->checkBox_fileFmt_tif->isChecked()){
+        out << "fmt_tif=1\n";
+    }
+    if(ui->checkBox_fileFmt_gif->isChecked()){
+        out << "fmt_gif=1\n";
+    }
+    if(ui->checkBox_fileFmt_bmp->isChecked()){
+        out << "fmt_bmp=1\n";
+    }
+    if(ui->checkBox_fileFmt_png->isChecked()){
+        out << "fmt_png=1\n";
+    }
+    if(ui->checkBox_fileFmt_mov->isChecked()){
+        out << "fmt_mov=1\n";
+    }
+    if(ui->checkBox_fileFmt_avi->isChecked()){
+        out << "fmt_avi=1\n";
+    }
+    if(ui->checkBox_fileFmt_mpg->isChecked()){
+        out << "fmt_mpg=1\n";
+    }
+    if(ui->checkBox_fileFmt_m4v->isChecked()){
+        out << "fmt_m4v=1\n";
+    }
+    if(ui->checkBox_fileFmt_mkv->isChecked()){
+        out << "fmt_mkv=1\n";
+    }
+    if(ui->checkBox_fileFmt_divx->isChecked()){
+        out << "fmt_divx=1\n";
+    }
+    if(ui->checkBox_fileFmt_mp4->isChecked()){
+        out << "fmt_mp4=1\n";
+    }
+
+    //
+    // options
+    //
+
+    if(ui->checkBox_includeSubDir->isChecked()){
+        out << "subdir=1\n";
+    }
+    if(ui->checkBox_overwt->isChecked()){
+        out << "overwrite=1\n";
+    }
+
+    //
+    // directory struct as date
+    //
+
+    if(ui->checkBox_dirAsDate->isChecked()){
+        if(ui->radioBtn_dirAsY->isChecked()){
+            out << "diry=1\n";
+        }
+        else if(ui->radioBtn_dirAsYM->isChecked()){
+            out << "dirym=1\n";
+        }
+        else if(ui->radioBtn_dirAsYMD->isChecked()){
+            out << "dirymd=1";
+        }
+    }
+
+    cfgFile.close();
+}
+
+/*
+ * name : readCfg
+ * desc : read and apply text configuration file content
+ */
+void MainWindow::readCfg(void)
+{
+    QFile cfgFile(tr(".picin.cfg"));
+
+    if (!cfgFile.open(QIODevice::ReadOnly | QIODevice::Text)){
+        return;
+    }
+
+    QTextStream cfgTextStream(&cfgFile);
+    while (!cfgTextStream.atEnd()) {
+        QString cfgLine;
+        QString cfgValue;
+
+        cfgLine = cfgTextStream.readLine();
+        cfgValue = cfgLine.section('=', 1, 1);
+
+        //
+        // file path
+        //
+
+        if(cfgLine.startsWith(tr("source="))){
+            ui->lineEdit_path_source->setText(cfgValue);
+        }
+        else if(cfgLine.startsWith(tr("target="))){
+            ui->lineEdit_path_target->setText(cfgValue);
+        }
+
+        //
+        // file format
+        //
+
+        else if(cfgLine.startsWith(tr("fmt_jpg="))){
+            ui->checkBox_fileFmt_jpg->setChecked(cfgValue.toInt(0, 10));
+        }
+        else if(cfgLine.startsWith(tr("fmt_tif="))){
+            ui->checkBox_fileFmt_tif->setChecked(cfgValue.toInt(0, 10));
+        }
+        else if(cfgLine.startsWith(tr("fmt_gif="))){
+            ui->checkBox_fileFmt_gif->setChecked(cfgValue.toInt(0, 10));
+        }
+        else if(cfgLine.startsWith(tr("fmt_bmp="))){
+            ui->checkBox_fileFmt_bmp->setChecked(cfgValue.toInt(0, 10));
+        }
+        else if(cfgLine.startsWith(tr("fmt_png="))){
+            ui->checkBox_fileFmt_png->setChecked(cfgValue.toInt(0, 10));
+        }
+        else if(cfgLine.startsWith(tr("fmt_mov="))){
+            ui->checkBox_fileFmt_mov->setChecked(cfgValue.toInt(0, 10));
+        }
+        else if(cfgLine.startsWith(tr("fmt_avi="))){
+            ui->checkBox_fileFmt_avi->setChecked(cfgValue.toInt(0, 10));
+        }
+        else if(cfgLine.startsWith(tr("fmt_mpg="))){
+            ui->checkBox_fileFmt_mpg->setChecked(cfgValue.toInt(0, 10));
+        }
+        else if(cfgLine.startsWith(tr("fmt_m4v="))){
+            ui->checkBox_fileFmt_m4v->setChecked(cfgValue.toInt(0, 10));
+        }
+        else if(cfgLine.startsWith(tr("fmt_mkv="))){
+            ui->checkBox_fileFmt_mkv->setChecked(cfgValue.toInt(0, 10));
+        }
+        else if(cfgLine.startsWith(tr("fmt_divx="))){
+            ui->checkBox_fileFmt_divx->setChecked(cfgValue.toInt(0, 10));
+        }
+        else if(cfgLine.startsWith(tr("fmt_mp4="))){
+            ui->checkBox_fileFmt_mp4->setChecked(cfgValue.toInt(0, 10));
+        }
+        else if(cfgLine.startsWith(tr("subdir="))){
+            ui->checkBox_includeSubDir->setChecked(cfgValue.toInt(0, 10));
+        }
+        else if(cfgLine.startsWith(tr("overwrite="))){
+            ui->checkBox_overwt->setChecked(cfgValue.toInt(0, 10));
+        }
+
+        //
+        // directory struct as date
+        //
+
+        else if(cfgLine.startsWith(tr("diry="))){
+            if(cfgValue.toInt(0, 10) == 1){
+                ui->checkBox_dirAsDate->setChecked(false);
+                ui->checkBox_dirAsDate->click();
+                ui->radioBtn_dirAsY->setChecked(true);
+            }
+        }
+        else if(cfgLine.startsWith(tr("dirym="))){
+            if(cfgValue.toInt(0, 10) == 1){
+                ui->checkBox_dirAsDate->setChecked(false);
+                ui->checkBox_dirAsDate->click();
+                ui->radioBtn_dirAsYM->setChecked(true);
+            }
+        }
+        else if(cfgLine.startsWith(tr("dirymd="))){
+            if(cfgValue.toInt(0, 10) == 1){
+                ui->checkBox_dirAsDate->setChecked(false);
+                ui->checkBox_dirAsDate->click();
+                ui->radioBtn_dirAsYMD->setChecked(true);
+            }
+        }
+    }
+
+    cfgFile.close();
 }
 
 // ****************************************************************************
