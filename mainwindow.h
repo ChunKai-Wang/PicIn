@@ -6,6 +6,7 @@
 #include <QFileDialog>
 #include <QPushButton>
 #include <QMessageBox>
+#include <QTextStream>
 
 #include "ui_mainwindow.h"
 #include "dialog_msg.h"
@@ -16,7 +17,13 @@
 #include "ui_dialog_import_progress.h"
 #include "picin_core.h"
 
+#ifdef Q_OS_WIN
+#include "Windows.h"
+#endif
+
 #define PICIN_VER "V0.1"
+#define CFG_FILE_NAME ".picin.cfg"
+#define CFG_FILE_NAME_L L".picin.cfg"
 
 namespace Ui {
 class MainWindow;

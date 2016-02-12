@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include <QTextStream>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -59,7 +58,7 @@ MainWindow::~MainWindow()
  */
 void MainWindow::updateCfg(void)
 {
-    QFile cfgFile(tr(".picin.cfg"));
+    QFile cfgFile(tr(CFG_FILE_NAME));
 
     if(cfgFile.exists()){
         cfgFile.remove();
@@ -151,6 +150,18 @@ void MainWindow::updateCfg(void)
     }
 
     cfgFile.close();
+
+#ifdef Q_OS_WIN
+    //
+    // Set config file to hidden for windows os
+    //
+
+    wchar_t wWinCfgFileName[] = CFG_FILE_NAME_L;
+    int attr = 0;
+
+    attr = GetFileAttributes(wWinCfgFileName);
+    SetFileAttributes(wWinCfgFileName, attr | FILE_ATTRIBUTE_HIDDEN);
+#endif
 }
 
 /*
@@ -159,7 +170,7 @@ void MainWindow::updateCfg(void)
  */
 void MainWindow::readCfg(void)
 {
-    QFile cfgFile(tr(".picin.cfg"));
+    QFile cfgFile(tr(CFG_FILE_NAME));
 
     if (!cfgFile.open(QIODevice::ReadOnly | QIODevice::Text)){
         return;
