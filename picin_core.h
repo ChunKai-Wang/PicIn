@@ -39,6 +39,7 @@ public:
     QDate getExifDate(QString path);
     int getBlEndInt32(char bl, u_int8_t *buf, int len);
 
+    void setFlagExifDate(bool flag);
     void setFlagDir(bool year, bool month, bool day);
     void setFlagCancel_true();
     void setFlagSubDir(bool flag);
@@ -62,6 +63,7 @@ private:
     QString m_path_target;
 
     bool m_flagCancel;
+    bool m_flagExifDate;
     bool m_flagDirYear;
     bool m_flagDirMon;
     bool m_flagDirDay;

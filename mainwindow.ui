@@ -246,7 +246,7 @@ QGroupBox::title {
            <item row="2" column="0">
             <widget class="QCheckBox" name="checkBox_dirAsDate">
              <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Store pictures to different sub directory as when were them taken.&lt;/p&gt;&lt;p&gt;Example, a picture were taken on 2016/01/17,&lt;br/&gt;this option may store the picture to&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;&amp;lt;target path&amp;gt;/2016/&lt;br/&gt;&lt;/span&gt;or&lt;br/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;&amp;lt;target path&amp;gt;/2016/01/&lt;br/&gt;&lt;/span&gt;or&lt;br/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;&amp;lt;target path&amp;gt;/2016/01/17/&lt;/span&gt;&lt;/p&gt;&lt;p&gt;as directory struct choiced.&lt;/p&gt;&lt;p&gt;PicIn read &lt;span style=&quot; font-weight:600;&quot;&gt;jpg's exif&lt;/span&gt; to know when are pictures taken,&lt;br/&gt;uses &lt;span style=&quot; font-weight:600;&quot;&gt;&amp;quot;last modified date&amp;quot; for other media format&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Store files to different sub directory as its &lt;span style=&quot; font-weight:600;&quot;&gt;&amp;quot;last modified date&amp;quot;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Example, a picture were taken on 2016/01/17,&lt;br/&gt;this option may store the picture to&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;&amp;lt;target path&amp;gt;/2016/&lt;br/&gt;&lt;/span&gt;or&lt;br/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;&amp;lt;target path&amp;gt;/2016/01/&lt;br/&gt;&lt;/span&gt;or&lt;br/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;&amp;lt;target path&amp;gt;/2016/01/17/&lt;/span&gt;&lt;/p&gt;&lt;p&gt;as directory struct choiced.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
               <string>Import pics to different folder as date</string>
@@ -260,7 +260,7 @@ QGroupBox::title {
              </property>
             </widget>
            </item>
-           <item row="3" column="0">
+           <item row="4" column="0">
             <layout class="QHBoxLayout" name="HLayout_dirAsDate">
              <property name="leftMargin">
               <number>6</number>
@@ -295,6 +295,16 @@ QGroupBox::title {
             <widget class="QCheckBox" name="checkBox_overwt">
              <property name="text">
               <string>Overwrite exist files</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QCheckBox" name="checkBox_exifDate">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;For jpg/jpeg, use &lt;span style=&quot; font-weight:600;&quot;&gt;exif's &amp;quot;original date&amp;quot;&lt;/span&gt; instead &amp;quot;last modified date&amp;quot; to judge when were pictures taken.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>Use exif's original date for jpg/jpeg</string>
              </property>
             </widget>
            </item>

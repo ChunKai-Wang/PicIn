@@ -175,8 +175,10 @@ void PicIn_Core::import_doit()
         // Check whether need to separate pics to folders as date
         //
 
-        date = getExifDate(srcPath);
-        if(!date.isValid()){
+        if(m_flagExifDate){
+            date = getExifDate(srcPath);
+        }
+        if(!date.isValid() || !m_flagExifDate){
             date = this->m_fileInfoList_img.at(i).lastModified().date();
         }
 
@@ -311,7 +313,7 @@ QDate PicIn_Core::getExifDate(QString path)
             len_ffe0 = buf[offset_lenOfFfe0] * 0x10 + buf[offset_lenOfFfe0 + 1];
 
             if(buf[offset_lenOfFfe0 + len_ffe0] == 0xff && buf[offset_lenOfFfe0 + len_ffe0 + 1] == 0xe1){
-                offset_ffe1 = offset_lenOfFfe0 + len_ffe0 + 2;
+                offset_ffe1 = offset_lenOfFfe0 + len_ffe0;
             }
             else{
                 goto errout;
@@ -487,6 +489,15 @@ void PicIn_Core::setFlagSubDir(bool flag)
 void PicIn_Core::setFlagOverwrite(bool flag)
 {
     PicIn_Core::m_flagOverwrite = flag;
+}
+
+/*
+ * name : setFlagExifDate
+ * desc : Set value of m_flagExifDate
+ */
+void PicIn_Core::setFlagExifDate(bool flag)
+{
+    PicIn_Core::m_flagExifDate = flag;
 }
 
 // ****************************************************************************

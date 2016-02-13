@@ -11,6 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->radioBtn_dirAsY->setEnabled(false);
     ui->radioBtn_dirAsYM->setEnabled(false);
     ui->radioBtn_dirAsYMD->setEnabled(false);
+    ui->checkBox_exifDate->setEnabled(false);
 
 #ifdef Q_OS_WIN
     ui->radioBtn_dirAsY->setText(tr("Year\\"));
@@ -138,6 +139,10 @@ void MainWindow::updateCfg(void)
     //
 
     if(ui->checkBox_dirAsDate->isChecked()){
+        if(ui->checkBox_exifDate->isChecked()){
+            out << "exifdate=1\n";
+        }
+
         if(ui->radioBtn_dirAsY->isChecked()){
             out << "diry=1\n";
         }
@@ -246,6 +251,10 @@ void MainWindow::readCfg(void)
         // directory struct as date
         //
 
+        else if(cfgLine.startsWith(tr("exifdate="))){
+            ui->checkBox_exifDate->setChecked(cfgValue.toInt(0, 10));
+        }
+
         else if(cfgLine.startsWith(tr("diry="))){
             if(cfgValue.toInt(0, 10) == 1){
                 ui->checkBox_dirAsDate->setChecked(false);
@@ -320,9 +329,11 @@ void MainWindow::slot_import()
             dirAsD = true;
         }
         m_picInCore->setFlagDir(dirAsY, dirAsM, dirAsD);
+        m_picInCore->setFlagExifDate(ui->checkBox_exifDate->isChecked());
     }
     else{
         m_picInCore->setFlagDir(false, false, false);
+        m_picInCore->setFlagExifDate(false);
     }
 
     //
@@ -563,6 +574,7 @@ void MainWindow::slot_checkbox_dirAsDate_clicked(void)
     ui->radioBtn_dirAsY->setEnabled(checked);
     ui->radioBtn_dirAsYM->setEnabled(checked);
     ui->radioBtn_dirAsYMD->setEnabled(checked);
+    ui->checkBox_exifDate->setEnabled(checked);
 
     //
     // Set year to default
