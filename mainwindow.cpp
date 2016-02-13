@@ -59,7 +59,10 @@ MainWindow::~MainWindow()
  */
 void MainWindow::updateCfg(void)
 {
-    QFile cfgFile(tr(CFG_FILE_NAME));
+    QString cfgFilePath = QDir::homePath();
+    cfgFilePath.append("/"CFG_FILE_NAME);
+
+    QFile cfgFile(cfgFilePath);
 
     if(cfgFile.exists()){
         cfgFile.remove();
@@ -161,11 +164,21 @@ void MainWindow::updateCfg(void)
     // Set config file to hidden for windows os
     //
 
-    wchar_t wWinCfgFileName[] = CFG_FILE_NAME_L;
+    wchar_t *wWinCfgFileName = NULL;
     int attr = 0;
+
+    // the +1 is for null char
+    wWinCfgFileName = new wchar_t[cfgFilePath.length() + 1];
+    if(wWinCfgFileName == NULL){
+        return;
+    }
+
+    wWinCfgFileName[cfgFilePath.length()] = 0;
+    cfgFilePath.toWCharArray(wWinCfgFileName);
 
     attr = GetFileAttributes(wWinCfgFileName);
     SetFileAttributes(wWinCfgFileName, attr | FILE_ATTRIBUTE_HIDDEN);
+    delete wWinCfgFileName;
 #endif
 }
 
@@ -175,8 +188,10 @@ void MainWindow::updateCfg(void)
  */
 void MainWindow::readCfg(void)
 {
-    QFile cfgFile(tr(CFG_FILE_NAME));
+    QString cfgFilePath = QDir::homePath();
+    cfgFilePath.append("/"CFG_FILE_NAME);
 
+    QFile cfgFile(cfgFilePath);
     if (!cfgFile.open(QIODevice::ReadOnly | QIODevice::Text)){
         return;
     }
@@ -499,6 +514,11 @@ void MainWindow::slot_button_import_clicked(void)
     }
     if(ui->checkBox_fileFmt_mkv->isChecked()){
         nameFilters.append(tr("*.mp4"));
+    }
+
+    if(nameFilters.size() == 0){
+        emit signal_show_dialog("Please choose least one file type");
+        return;
     }
 
     //
