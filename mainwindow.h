@@ -21,7 +21,7 @@
 #include "Windows.h"
 #endif
 
-#define PICIN_VER "V0.1"
+#define PICIN_VER "v0.1"
 #define CFG_FILE_NAME ".picin.cfg"
 #define CFG_FILE_NAME_L L".picin.cfg"
 
