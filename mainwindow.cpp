@@ -50,6 +50,133 @@ MainWindow::~MainWindow()
 }
 
 // ****************************************************************************
+// ****                       Public functions:                            ****
+// ****************************************************************************
+
+/*
+ * name : getSelectedPathFromView
+ * desc : Get selected path of file/folder from a view
+ * in   :
+ *   *view, The point of view
+ *   *fileList, Pointer of buffer to store selected file path list
+ *   *dirList, Pointer of buffer to store selected folder path list
+ * out  :
+ *   *fileList, Selected file path QString list
+ *   *dirList, Selected folder path QString list
+ * ret  :
+ *    A QStringList included all path list
+ */
+QStringList
+MainWindow::getSelectedPathFromView(
+    QAbstractItemView *view,
+    QStringList *fileList,
+    QStringList *dirList
+)
+{
+    QStringList selList;
+    QFileSystemModel *fsModel = (QFileSystemModel *)view->model();
+
+    for(int i = 0; i < view->selectionModel()->selectedRows().size(); i++){
+        QString path;
+        QModelIndex index = view->selectionModel()->selectedRows().at(i);
+
+        path = modelIndexToFullPath(fsModel, index);
+        if(path.size() > 0){
+            if(fsModel->type(index).compare(tr("Folder")) && fileList){
+                fileList->append(path);
+            }
+            else if(!fsModel->type(index).compare(tr("Folder")) && dirList){
+                dirList->append(path);
+            }
+            selList.append(path);
+        }
+    }
+
+    return selList;
+}
+
+/*
+ * name : modelIndexToFullPath
+ * desc : Get full path for selected index of a file system model,
+ *        keep call mode->parent() until no parent anymore
+ * in   :
+ *   model, The pointer of QFileSystemModel
+ *   index, Selected index
+ * ret  :
+ *    A QString of full path
+ */
+QString MainWindow::modelIndexToFullPath(QFileSystemModel *fsMode, QModelIndex index)
+{
+    QString fullPath;
+    QString node;
+    QString tempPath;
+
+    while(index.isValid()){
+        node = fsMode->data(index, Qt::DisplayRole).toString();
+        if(node.size() > 0){
+            // If selection is folder, add "/" to the end of path
+            if(node.compare(tr("/")) && !fsMode->type(index).compare("Folder")){
+                node.append(tr("/"));
+            }
+            node.append(fullPath);
+            fullPath = node;
+        }
+        index = fsMode->parent(index);
+    }
+
+    return fullPath;
+}
+
+/*
+ * name : rmOverlapParentPath
+ * desc : Remove unneeded selected parent path,
+ *        example, select folder "/A/1/" and "/A/2/" by QFileDialog,
+ *        it sometimes get "/A/", "/A/1/", "/A/2/",
+ *        this function removes the unneeded "/A/"
+ * in   :
+ *   pathList, Selected path list
+ * ret  :
+ *    A QStringList of result
+ */
+QStringList MainWindow::rmOverlapParentPath(QStringList pathList)
+{
+    QStringList newPathList;
+    bool overlap = true;
+
+    newPathList.append(pathList);
+
+    while(overlap){
+        overlap = false;
+
+        for(int i = 0; i < newPathList.size(); i++){
+            QString rmPath = newPathList.at(i);
+
+            for(int j = 0; j < newPathList.size(); j++){
+                QString cmpPath = newPathList.at(j);
+
+                if(i == j){
+                    continue;
+                }
+                if(cmpPath.contains(rmPath, Qt::CaseSensitive)){
+                    // rmPath is a part of other path,
+                    // that means it is somebody's parent path,
+                    // remove it.
+                    overlap = true;
+                    newPathList.removeAt(i);
+                    break;
+                }
+            }
+
+            if(overlap){
+                break;
+            }
+        }
+    }
+
+    return newPathList;
+}
+
+// ****************************************************************************
 // ****                      Private functions:                            ****
 // ****************************************************************************
 
@@ -389,20 +516,53 @@ void MainWindow::slot_button_browse_source_clicked(void)
 {
     QFileDialog fileDialog;
     QString dirPath;
+    QStringList dirList;
     QDir dir;
 
-    dirPath = fileDialog.getExistingDirectory(
-                  this,
-                  tr("choose directory"),
-                  "",
-                  QFileDialog::ShowDirsOnly |
-                  QFileDialog::DontResolveSymlinks |
-                  QFileDialog::DontUseCustomDirectoryIcons);
+    //
+    // Set fileDialog
+    //
 
-    dirPath = dir.toNativeSeparators(dirPath);
-    if(!dirPath.isNull()){
-        ui->lineEdit_path_source->setText(dirPath);
+    fileDialog.setFileMode(QFileDialog::DirectoryOnly);
+    fileDialog.setOption(QFileDialog::ShowDirsOnly, true);
+    fileDialog.setOption(QFileDialog::DontResolveSymlinks, true);
+    fileDialog.setOption(QFileDialog::DontUseCustomDirectoryIcons, true);
+    fileDialog.setOption(QFileDialog::DontUseNativeDialog, true);
+    fileDialog.setParent(0);
+    fileDialog.setWindowTitle(tr("Choose directory"));
+    fileDialog.setDirectory(QDir::home());
+
+    //
+    // Get treeView from fileDialog and set multi selection
+    //
+
+    QTreeView *treeView = fileDialog.findChild<QTreeView*>("treeView");
+    if (treeView) {
+       treeView->setSelectionMode(QAbstractItemView::MultiSelection);
     }
+
+    fileDialog.exec();
+
+    //
+    // Get data(string list of selection path) from view
+    //
+
+    getSelectedPathFromView(treeView, NULL, &dirList);
+    dirList = rmOverlapParentPath(dirList);
+
+    //
+    // Update ui
+    //
+
+    dirPath.clear();
+    for(int i = 0; i < dirList.size(); i++){
+        dirPath.append(dir.toNativeSeparators(dirList.at(i)));
+        if(i+1 < dirList.size()){
+            dirPath.append(tr(";"));
+
+        }
+    }
+    ui->lineEdit_path_source->setText(dirPath);
 }
 
 /*
@@ -439,12 +599,12 @@ void MainWindow::slot_button_import_clicked(void)
     // Check empty path
     //
 
-    if(!ui->lineEdit_path_source->text().compare(tr(""), Qt::CaseInsensitive)){
+    if(ui->lineEdit_path_source->text().length() == 0){
         emit signal_show_dialog(tr("Please input source path"));
         return;
     }
 
-    if(!ui->lineEdit_path_target->text().compare(tr(""), Qt::CaseInsensitive)){
+    if(ui->lineEdit_path_target->text().length() == 0){
         emit signal_show_dialog(tr("Please input target path"));
         return;
     }
@@ -453,18 +613,33 @@ void MainWindow::slot_button_import_clicked(void)
     // Check whether path is exist
     //
 
-    if(m_picInCore->set_path(
-         ui->lineEdit_path_source->text(),
-         PicIn_Core::PT_Source) != 0)
-    {
-        emit signal_show_dialog("Source path isn't' exist");
+    int ret = 0;
+    ret = m_picInCore->set_path(
+                ui->lineEdit_path_source->text().split(";"),
+                PicIn_Core::PT_Source);
+    if(ret != 0){
+        QString errStr;
+
+        if(ret > 0){
+            errStr.sprintf("Source path %d isn't exist", ret);
+        }
+        else{
+            errStr.sprintf("Source path isn't' exist");
+        }
+        emit signal_show_dialog(errStr);
         return;
     }
 
-    if(m_picInCore->set_path(
-         ui->lineEdit_path_target->text(),
-         PicIn_Core::PT_Target) != 0)
-    {
+    // Currently, only support single target path
+    if(ui->lineEdit_path_target->text().split(";").size() > 1){
+        emit signal_show_dialog("Only support single target path");
+        return;
+    }
+
+    ret = m_picInCore->set_path(
+               ui->lineEdit_path_target->text().split(";"),
+               PicIn_Core::PT_Target);
+    if(ret != 0){
         emit signal_show_dialog("Target path isn't' exist");
         return;
     }

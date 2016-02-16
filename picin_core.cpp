@@ -30,7 +30,7 @@ PicIn_Core::PicIn_Core()
 int PicIn_Core::scanSrcFiles(QStringList filters)
 {
     m_fileInfoList_img.clear();
-    m_fileInfoList_img = get_file_list(m_path_source, filters);
+    m_fileInfoList_img = get_file_list(m_pathList_source, filters);
     m_numFiles = m_fileInfoList_img.size();
 
     return m_numFiles;
@@ -54,10 +54,10 @@ int PicIn_Core::getNumFilesSrc(void)
  *   pt, Set path to source or target
  * ret  :
  *    0, Success
- *   -1, Path doesn't exist
+ *    > 0, Which path isn't exist, 1 is 1st path
  *   -2, Invalid path type
  */
-int PicIn_Core::set_path(QString path, PicIn_Core::PathType pt)
+int PicIn_Core::set_path(QStringList pathList, PathType pt)
 {
     if(pt != PT_Source && pt != PT_Target){
         return -2;
@@ -67,33 +67,35 @@ int PicIn_Core::set_path(QString path, PicIn_Core::PathType pt)
     // Check whether path has forward slash at last char
     //
 
-    QChar lastChar = path.at(path.size() - 1);;
-    QString slash;
+    for(int i = 0; i < pathList.size(); i++){
+        QString path = pathList.at(i);
+        QChar lastChar = path.at(path.size() - 1);;
+        QString slash;
 
-    switch(m_os){
-    case OS_LINUX:
-    default:
-        slash.sprintf("%s", "/");
-        break;
+        switch(m_os){
+        case OS_LINUX:
+        default:
+            slash.sprintf("%s", "/");
+            break;
 
-    case OS_WIN:
-        slash.sprintf("%s", "\\");
-        break;
-    }
+        case OS_WIN:
+            slash.sprintf("%s", "\\");
+            break;
+        }
 
-    if(!operator ==(lastChar, slash.at(0))){
-        path.append(slash);
-    }
+        if(!operator ==(lastChar, slash.at(0))){
+            path.append(slash);
+        }
 
-    //
-    // Check path
-    //
+        //
+        // Check path
+        //
 
-    QDir dir(path);
-    QString *strPtr;
+        QDir dir(path);
 
-    if(!dir.exists()){
-        return -1;
+        if(!dir.exists()){
+            return i + 1;
+        }
     }
 
     //
@@ -102,19 +104,17 @@ int PicIn_Core::set_path(QString path, PicIn_Core::PathType pt)
 
     switch(pt){
     case PT_Source:
-        strPtr = &m_path_source;
+        m_pathList_source.clear();
+        m_pathList_source.append(pathList);
         break;
 
     case PT_Target:
-        strPtr = &m_path_target;
+        m_pathList_target.clear();
+        m_pathList_target.append(pathList);
         break;
     }
 
-    strPtr->clear();
-    strPtr->append(path);
-
     return 0;
-
 }
 
 /*
@@ -169,7 +169,7 @@ void PicIn_Core::import_doit()
         tgtName.append(this->m_fileInfoList_img.at(i).fileName());
 
         tgtPath.clear();
-        tgtPath.append(m_path_target);
+        tgtPath.append(m_pathList_target.at(0)); // Only support 1 target path
 
         //
         // Check whether need to separate pics to folders as date
@@ -504,6 +504,26 @@ void PicIn_Core::setFlagExifDate(bool flag)
 // ****                      Private functions:                            ****
 // ****************************************************************************
 
+
+/*
+ * name : get_file_list
+ * desc : Scan indicated path list and return file info list of images
+ * in   :
+ *   pathList, String list of source path
+ *   filters, String list of file extension name
+ * ret  : List of QFileInfo for all files under indicated path
+ */
+QFileInfoList
+PicIn_Core::get_file_list(QStringList pathList, QStringList filters)
+{
+    QFileInfoList fileInfoList;
+    for(int i = 0; i < pathList.size(); i++){
+        fileInfoList.append(get_file_list(pathList.at(i), filters));
+    }
+
+    return fileInfoList;
+}
+
 /*
  * name : get_file_list
  * desc : Scan indicated path and return file info list of images
@@ -512,10 +532,8 @@ void PicIn_Core::setFlagExifDate(bool flag)
  *   filters, String list of file extension name
  * ret  : List of QFileInfo for all files under indicated path
  */
-QFileInfoList PicIn_Core::get_file_list(
-        QString path,
-        QStringList filters
-)
+QFileInfoList
+PicIn_Core::get_file_list(QString path, QStringList filters)
 {
     QDir dir(path);
     QStringList nameFilters;

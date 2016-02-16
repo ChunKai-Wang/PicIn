@@ -7,6 +7,8 @@
 #include <QPushButton>
 #include <QMessageBox>
 #include <QTextStream>
+#include <QTreeView>
+#include <QFileSystemModel>
 
 #include "ui_mainwindow.h"
 #include "dialog_msg.h"
@@ -35,6 +37,10 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+    QStringList getSelectedPathFromView(QAbstractItemView *view, QStringList *fileList, QStringList *dirList);
+    QString modelIndexToFullPath(QFileSystemModel *model, QModelIndex index);
+    QStringList rmOverlapParentPath(QStringList pathList);
 
 private:
     Ui::MainWindow *ui;
