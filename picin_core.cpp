@@ -241,6 +241,9 @@ void PicIn_Core::import_doit()
  */
 QDate PicIn_Core::getExifDate(QString path)
 {
+#define JPG_SOI 0xffd8
+#define JPG_SOS 0xffda
+#define BUF_DEFAULT_SIZE 4096
     QFile file(path);
     int y = 0;
     int m = 0;
@@ -248,10 +251,11 @@ QDate PicIn_Core::getExifDate(QString path)
 
     char blEnd = 'l';
 
-    u_int8_t buf[4096];
+    u_int8_t *buf = NULL;
 
     u_int16_t offset_ffe1 = 0;
     u_int16_t offset_lenOfFfe1 = 0;
+    u_int16_t app1Size = 0;
 
     u_int16_t offset_ffe0 = 0;
     u_int16_t offset_lenOfFfe0 = 0;
@@ -270,21 +274,32 @@ QDate PicIn_Core::getExifDate(QString path)
     u_int32_t offset_orgDate = 0;
 
     int i = 0;
-    int multiplier = 0;
+    int dateMultiplier = 0;
+
+    int ret = 0;
 
     //
     // Start
     //
 
-    file.open(QIODevice::ReadOnly);
+    buf = new u_int8_t[BUF_DEFAULT_SIZE];
+    if(!buf){
+        qWarning("allocate buffer failed\n");
+        goto errout;
+    }
 
-    file.read((char *)buf, 4096);
+    file.open(QIODevice::ReadOnly);
+    ret = file.read((char *)buf, BUF_DEFAULT_SIZE);
+    if(ret < 0){
+        qWarning("Read %s failed\n", path.toLatin1().data());
+    }
 
     //
     // Check 0xFFD8(Start Of Image)
     //
 
-    if(buf[0] != 0xff && buf[1] != 0xd8){
+    if(getBlEndInt32('b', buf, 2) != JPG_SOI){
+        qInfo("%s isn't jpg/jpeg\n", path.toLatin1().data());
         goto errout;
     }
 
@@ -332,6 +347,26 @@ QDate PicIn_Core::getExifDate(QString path)
     offset_tiffHeader = offset_exifHeader + 6;
 
     //
+    // Check if buffer size is enough
+    //
+
+    app1Size = getBlEndInt32('b', (u_int8_t *)&buf[offset_lenOfFfe1], 2);
+    if(app1Size > BUF_DEFAULT_SIZE){
+        delete[] buf;
+        buf = new u_int8_t[app1Size];
+        if(!buf){
+            qWarning("Can't re-assign buffer\n");
+            goto errout;
+        }
+        ret = file.seek(0);
+        ret = file.read((char *)buf, app1Size);
+        if(ret < 0 || ret < app1Size){
+            qWarning("Read %s to new buffer failed\n", path.toLatin1().data());
+            goto errout;
+        }
+    }
+
+    //
     // Check tiff header
     //
 
@@ -366,6 +401,7 @@ QDate PicIn_Core::getExifDate(QString path)
         ifdEntry++;
     }
     if(i == numOfIfdEntry){
+        qWarning("%s can't find exif sub ifd\n", path.toLatin1().data());
         goto errout;
     }
 
@@ -387,6 +423,7 @@ QDate PicIn_Core::getExifDate(QString path)
         ifdEntry++;
     }
     if(i == numOfIfdEntry){
+        qWarning("%s can't find original date from exif\n", path.toLatin1().data());
         goto errout;
     }
 
@@ -396,29 +433,32 @@ QDate PicIn_Core::getExifDate(QString path)
     //
 
     // year
-    multiplier = 1000;
+    dateMultiplier = 1000;
     for(i = 0; i < 4; i++){
-        y += (buf[offset_orgDate + 0 + i] - 0x30) * multiplier;
-        multiplier /= 10;
+        y += (buf[offset_orgDate + 0 + i] - 0x30) * dateMultiplier;
+        dateMultiplier /= 10;
     }
 
     // month
-    multiplier = 10;
+    dateMultiplier = 10;
     for(i = 0; i < 2; i++){
-        m += (buf[offset_orgDate + 5 + i] - 0x30) * multiplier;
-        multiplier /= 10;
+        m += (buf[offset_orgDate + 5 + i] - 0x30) * dateMultiplier;
+        dateMultiplier /= 10;
     }
 
     // day
-    multiplier = 10;
+    dateMultiplier = 10;
     for(i = 0; i < 2; i++){
-        d += (buf[offset_orgDate + 8 + i] - 0x30) * multiplier;
-        multiplier /= 10;
+        d += (buf[offset_orgDate + 8 + i] - 0x30) * dateMultiplier;
+        dateMultiplier /= 10;
     }
 
 
 errout:
     file.close();
+    if(buf){
+        delete[] buf;
+    }
     return QDate(y, m, d);
 }
 

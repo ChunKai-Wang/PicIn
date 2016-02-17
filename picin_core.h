@@ -6,6 +6,7 @@
 #include <QDir>
 #include <QDate>
 #include <QProcess>
+#include <QDebug>
 
 #ifdef Q_OS_WIN
 #include "stdint.h"
