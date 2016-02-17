@@ -8,6 +8,7 @@
 #include <QMessageBox>
 #include <QTextStream>
 #include <QTreeView>
+#include <QListView>
 #include <QFileSystemModel>
 
 #include "ui_mainwindow.h"
@@ -25,6 +26,22 @@
 
 #define PICIN_VER "v0.1"
 #define CFG_FILE_NAME ".picin.cfg"
+
+//
+// OS specic define
+//
+
+#ifdef Q_OS_WIN
+#define MODEL_FS_INDEX_TYPE_FOLDER "File Folder"
+#endif
+
+#ifdef Q_OS_LINUX
+#define MODEL_FS_INDEX_TYPE_FOLDER "Folder"
+#endif
+
+//
+// declare class
+//
 
 namespace Ui {
 class MainWindow;

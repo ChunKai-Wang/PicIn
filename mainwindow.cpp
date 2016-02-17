@@ -80,12 +80,12 @@ MainWindow::getSelectedPathFromView(
         QString path;
         QModelIndex index = view->selectionModel()->selectedRows().at(i);
 
-        path = modelIndexToFullPath(fsModel, index);
+        path = fsModel->filePath(index);
         if(path.size() > 0){
-            if(fsModel->type(index).compare(tr("Folder")) && fileList){
+            if(fsModel->type(index).compare(tr(MODEL_FS_INDEX_TYPE_FOLDER)) && fileList){
                 fileList->append(path);
             }
-            else if(!fsModel->type(index).compare(tr("Folder")) && dirList){
+            else if(!fsModel->type(index).compare(tr(MODEL_FS_INDEX_TYPE_FOLDER)) && dirList){
                 dirList->append(path);
             }
             selList.append(path);
@@ -93,38 +93,6 @@ MainWindow::getSelectedPathFromView(
     }
 
     return selList;
-}
-
-/*
- * name : modelIndexToFullPath
- * desc : Get full path for selected index of a file system model,
- *        keep call mode->parent() until no parent anymore
- * in   :
- *   model, The pointer of QFileSystemModel
- *   index, Selected index
- * ret  :
- *    A QString of full path
- */
-QString MainWindow::modelIndexToFullPath(QFileSystemModel *fsMode, QModelIndex index)
-{
-    QString fullPath;
-    QString node;
-    QString tempPath;
-
-    while(index.isValid()){
-        node = fsMode->data(index, Qt::DisplayRole).toString();
-        if(node.size() > 0){
-            // If selection is folder, add "/" to the end of path
-            if(node.compare(tr("/")) && !fsMode->type(index).compare("Folder")){
-                node.append(tr("/"));
-            }
-            node.append(fullPath);
-            fullPath = node;
-        }
-        index = fsMode->parent(index);
-    }
-
-    return fullPath;
 }
 
 /*
@@ -528,6 +496,7 @@ void MainWindow::slot_button_browse_source_clicked(void)
     fileDialog.setOption(QFileDialog::DontResolveSymlinks, true);
     fileDialog.setOption(QFileDialog::DontUseCustomDirectoryIcons, true);
     fileDialog.setOption(QFileDialog::DontUseNativeDialog, true);
+
     fileDialog.setParent(0);
     fileDialog.setWindowTitle(tr("Choose directory"));
     fileDialog.setDirectory(QDir::home());
@@ -539,6 +508,11 @@ void MainWindow::slot_button_browse_source_clicked(void)
     QTreeView *treeView = fileDialog.findChild<QTreeView*>("treeView");
     if (treeView) {
        treeView->setSelectionMode(QAbstractItemView::MultiSelection);
+    }
+
+    QListView *listView = fileDialog.findChild<QListView*>("listView");
+    if (listView) {
+       listView->setSelectionMode(QAbstractItemView::MultiSelection);
     }
 
     fileDialog.exec();
