@@ -483,6 +483,7 @@ void MainWindow::slot_import_canceled(void)
 void MainWindow::slot_button_browse_source_clicked(void)
 {
     QFileDialog fileDialog;
+    QList<QUrl> urls;
     QString dirPath;
     QStringList dirList;
     QDir dir;
@@ -500,6 +501,37 @@ void MainWindow::slot_button_browse_source_clicked(void)
     fileDialog.setParent(0);
     fileDialog.setWindowTitle(tr("Choose directory"));
     fileDialog.setDirectory(QDir::home());
+
+    //
+    // Set sidebar shortcut
+    //
+
+    urls.clear();
+    urls.append(QUrl::fromLocalFile(QDir::homePath()));
+#ifdef Q_OS_LINUX
+    QString usr;
+    QString gvfsPath;
+    passwd *pwd;
+
+    usr = qgetenv("USER");
+    pwd = getpwnam(usr.toLatin1().data());
+
+    gvfsPath.sprintf("/run/user/%d/gvfs/", pwd->pw_uid);
+
+    if(QDir(gvfsPath).exists()){
+        urls.append(QUrl::fromLocalFile(gvfsPath));
+    }
+    urls.append(QUrl::fromLocalFile(QDir::rootPath()));
+#endif
+
+#ifdef Q_OS_WIN
+    QFileInfoList driveList = QDir::drives();
+
+    for(int i = 0; i < driveList.size(); i++){
+        urls.append(QUrl::fromLocalFile(driveList.at(i).absolutePath()));
+    }
+#endif
+    fileDialog.setSidebarUrls(urls);
 
     //
     // Get treeView from fileDialog and set multi selection

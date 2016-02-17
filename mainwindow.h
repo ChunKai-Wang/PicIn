@@ -24,6 +24,10 @@
 #include "Windows.h"
 #endif
 
+#ifdef Q_OS_LINUX
+#include "pwd.h"
+#endif
+
 #define PICIN_VER "v0.1"
 #define CFG_FILE_NAME ".picin.cfg"
 
