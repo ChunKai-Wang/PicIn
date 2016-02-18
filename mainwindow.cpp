@@ -46,6 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     updateCfg();
+    delete m_picInCore;
     delete ui;
 }
 
