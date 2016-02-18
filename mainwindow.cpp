@@ -144,6 +144,109 @@ QStringList MainWindow::rmOverlapParentPath(QStringList pathList)
     return newPathList;
 }
 
+/*
+ * name : selectPath
+ * desc : Call QFileDialog to select paths and return to QStringList,
+ *        keep using Non-Native file dialog for multi selection
+ * in   :
+ *   multiSel, Multi selection or not
+ *   options, Options of QFileDialog
+ * ret  :
+ *   QStringList of selected paths
+ */
+QStringList MainWindow::selectPath(
+    bool multiSel,
+    QFileDialog::FileMode fileMode,
+    QString startPath,
+    QFileDialog::Options options
+)
+{
+    QFileDialog fileDialog;
+    QList<QUrl> urls;
+    QString dirPath;
+    QStringList dirList;
+    QDir dir;
+
+    //
+    // Set fileDialog
+    //
+
+    fileDialog.setParent(0);
+    fileDialog.setDirectory(startPath);
+
+    options |= QFileDialog::DontUseNativeDialog;
+
+    if(fileMode & QFileDialog::Directory || fileMode & QFileDialog::DirectoryOnly){
+        fileDialog.setWindowTitle(tr("Choose directory"));
+    }
+    else{
+        fileDialog.setWindowTitle(tr("Choose file"));
+    }
+
+    fileDialog.setFileMode(fileMode);
+    fileDialog.setOptions(options | QFileDialog::DontUseNativeDialog);
+
+    //
+    // Set sidebar shortcut
+    //
+
+    urls.clear();
+    urls.append(QUrl::fromLocalFile(QDir::homePath()));
+
+#ifdef Q_OS_LINUX
+    QString usr;
+    QString gvfsPath;
+    passwd *pwd;
+
+    usr = qgetenv("USER");
+    pwd = getpwnam(usr.toLatin1().data());
+
+    gvfsPath.sprintf("/run/user/%d/gvfs/", pwd->pw_uid);
+
+    if(QDir(gvfsPath).exists()){
+        urls.append(QUrl::fromLocalFile(gvfsPath));
+    }
+    urls.append(QUrl::fromLocalFile(QDir::rootPath()));
+#endif
+
+#ifdef Q_OS_WIN
+    QFileInfoList driveList = QDir::drives();
+
+    for(int i = 0; i < driveList.size(); i++){
+        urls.append(QUrl::fromLocalFile(driveList.at(i).absolutePath()));
+    }
+#endif
+
+    fileDialog.setSidebarUrls(urls);
+
+    //
+    // Get view from fileDialog and set multi selection
+    //
+
+    QTreeView *treeView = fileDialog.findChild<QTreeView*>("treeView");
+    QListView *listView = fileDialog.findChild<QListView*>("listView");
+    if(multiSel){
+        if (treeView) {
+           treeView->setSelectionMode(QAbstractItemView::MultiSelection);
+        }
+
+        if (listView) {
+           listView->setSelectionMode(QAbstractItemView::MultiSelection);
+        }
+    }
+
+    fileDialog.exec();
+
+    //
+    // Get data(string list of selection path) from view
+    //
+
+    getSelectedPathFromView(treeView, NULL, &dirList);
+    dirList = rmOverlapParentPath(dirList);
+
+    return dirList;
+}
+
 // ****************************************************************************
 // ****                      Private functions:                            ****
 // ****************************************************************************
@@ -482,79 +585,17 @@ void MainWindow::slot_import_canceled(void)
  */
 void MainWindow::slot_button_browse_source_clicked(void)
 {
-    QFileDialog fileDialog;
-    QList<QUrl> urls;
     QString dirPath;
     QStringList dirList;
-    QDir dir;
 
     //
     // Set fileDialog
     //
 
-    fileDialog.setFileMode(QFileDialog::DirectoryOnly);
-    fileDialog.setOption(QFileDialog::ShowDirsOnly, true);
-    fileDialog.setOption(QFileDialog::DontResolveSymlinks, true);
-    fileDialog.setOption(QFileDialog::DontUseCustomDirectoryIcons, true);
-    fileDialog.setOption(QFileDialog::DontUseNativeDialog, true);
-
-    fileDialog.setParent(0);
-    fileDialog.setWindowTitle(tr("Choose directory"));
-    fileDialog.setDirectory(QDir::home());
-
-    //
-    // Set sidebar shortcut
-    //
-
-    urls.clear();
-    urls.append(QUrl::fromLocalFile(QDir::homePath()));
-#ifdef Q_OS_LINUX
-    QString usr;
-    QString gvfsPath;
-    passwd *pwd;
-
-    usr = qgetenv("USER");
-    pwd = getpwnam(usr.toLatin1().data());
-
-    gvfsPath.sprintf("/run/user/%d/gvfs/", pwd->pw_uid);
-
-    if(QDir(gvfsPath).exists()){
-        urls.append(QUrl::fromLocalFile(gvfsPath));
-    }
-    urls.append(QUrl::fromLocalFile(QDir::rootPath()));
-#endif
-
-#ifdef Q_OS_WIN
-    QFileInfoList driveList = QDir::drives();
-
-    for(int i = 0; i < driveList.size(); i++){
-        urls.append(QUrl::fromLocalFile(driveList.at(i).absolutePath()));
-    }
-#endif
-    fileDialog.setSidebarUrls(urls);
-
-    //
-    // Get treeView from fileDialog and set multi selection
-    //
-
-    QTreeView *treeView = fileDialog.findChild<QTreeView*>("treeView");
-    if (treeView) {
-       treeView->setSelectionMode(QAbstractItemView::MultiSelection);
-    }
-
-    QListView *listView = fileDialog.findChild<QListView*>("listView");
-    if (listView) {
-       listView->setSelectionMode(QAbstractItemView::MultiSelection);
-    }
-
-    fileDialog.exec();
-
-    //
-    // Get data(string list of selection path) from view
-    //
-
-    getSelectedPathFromView(treeView, NULL, &dirList);
-    dirList = rmOverlapParentPath(dirList);
+    QFileDialog::Options fileOption = QFileDialog::ShowDirsOnly |
+                                      QFileDialog::DontResolveSymlinks |
+                                      QFileDialog::DontUseCustomDirectoryIcons;
+    dirList = selectPath(true, QFileDialog::Directory, QDir::homePath(), fileOption);
 
     //
     // Update ui
@@ -562,12 +603,13 @@ void MainWindow::slot_button_browse_source_clicked(void)
 
     dirPath.clear();
     for(int i = 0; i < dirList.size(); i++){
-        dirPath.append(dir.toNativeSeparators(dirList.at(i)));
+        dirPath.append(QDir::toNativeSeparators(dirList.at(i)));
         if(i+1 < dirList.size()){
             dirPath.append(tr(";"));
 
         }
     }
+
     ui->lineEdit_path_source->setText(dirPath);
 }
 
@@ -577,22 +619,32 @@ void MainWindow::slot_button_browse_source_clicked(void)
  */
 void MainWindow::slot_button_browse_target_clicked(void)
 {
-    QFileDialog fileDialog;
     QString dirPath;
-    QDir dir;
+    QStringList dirList;
 
-    dirPath = fileDialog.getExistingDirectory(
-                  this,
-                  tr("choose directory"),
-                  "",
-                  QFileDialog::ShowDirsOnly |
-                  QFileDialog::DontResolveSymlinks |
-                  QFileDialog::DontUseCustomDirectoryIcons);
+    //
+    // Set fileDialog
+    //
 
-    dirPath = dir.toNativeSeparators(dirPath);
-    if(!dirPath.isNull()){
-        ui->lineEdit_path_target->setText(dirPath);
+    QFileDialog::Options fileOption = QFileDialog::ShowDirsOnly |
+                                      QFileDialog::DontResolveSymlinks |
+                                      QFileDialog::DontUseCustomDirectoryIcons;
+    dirList = selectPath(false, QFileDialog::Directory, QDir::homePath(), fileOption);
+
+    //
+    // Update ui
+    //
+
+    dirPath.clear();
+    for(int i = 0; i < dirList.size(); i++){
+        dirPath.append(QDir::toNativeSeparators(dirList.at(i)));
+        if(i+1 < dirList.size()){
+            dirPath.append(tr(";"));
+
+        }
     }
+
+    ui->lineEdit_path_target->setText(dirPath);
 }
 
 /*

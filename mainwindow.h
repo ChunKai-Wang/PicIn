@@ -62,6 +62,7 @@ public:
     QStringList getSelectedPathFromView(QAbstractItemView *view, QStringList *fileList, QStringList *dirList);
     QString modelIndexToFullPath(QFileSystemModel *model, QModelIndex index);
     QStringList rmOverlapParentPath(QStringList pathList);
+    QStringList selectPath(bool multiSel, QFileDialog::FileMode fileMode, QString startPath, QFileDialog::Options options);
 
 private:
     Ui::MainWindow *ui;
