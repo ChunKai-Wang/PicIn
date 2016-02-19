@@ -526,28 +526,28 @@ void MainWindow::slot_import()
     // Set import folder as date flags
     //
 
+    PicIn_Core::Options dateOptions;
+    dateOptions = PicIn_Core::optionDirDay |
+                  PicIn_Core::optionDirMon |
+                  PicIn_Core::optionDirYear;
+    m_picInCore->offOption(dateOptions);
     if(ui->checkBox_dirAsDate->isChecked()){
-        bool dirAsY = false;
-        bool dirAsM = false;
-        bool dirAsD = false;
         if(ui->radioBtn_dirAsY->isChecked()){
-            dirAsY = true;
+            m_picInCore->onOption(PicIn_Core::optionDirYear);
         }
         else if(ui->radioBtn_dirAsYM->isChecked()){
-            dirAsY = true;
-            dirAsM = true;
+            m_picInCore->onOption(PicIn_Core::optionDirYear | PicIn_Core::optionDirMon);
         }
         else if(ui->radioBtn_dirAsYMD->isChecked()){
-            dirAsY = true;
-            dirAsM = true;
-            dirAsD = true;
+            m_picInCore->onOption(dateOptions);
         }
-        m_picInCore->setFlagDir(dirAsY, dirAsM, dirAsD);
-        m_picInCore->setFlagExifDate(ui->checkBox_exifDate->isChecked());
-    }
-    else{
-        m_picInCore->setFlagDir(false, false, false);
-        m_picInCore->setFlagExifDate(false);
+
+        if(ui->checkBox_exifDate->isChecked()){
+            m_picInCore->onOption(PicIn_Core::optionExifDate);
+        }
+        else{
+            m_picInCore->offOption(PicIn_Core::optionExifDate);
+        }
     }
 
     //
@@ -572,7 +572,7 @@ void MainWindow::slot_import()
  */
 void MainWindow::slot_import_canceled(void)
 {
-    m_picInCore->setFlagCancel_true();
+    m_picInCore->onOption(PicIn_Core::optionCancel);
     m_flagImportCancel = true;
 }
 
@@ -759,7 +759,12 @@ void MainWindow::slot_button_import_clicked(void)
     // Get file list
     //
 
-    m_picInCore->setFlagSubDir(ui->checkBox_includeSubDir->isChecked());
+    if(ui->checkBox_includeSubDir->isChecked()){
+        m_picInCore->onOption(PicIn_Core::optionSubDir);
+    }
+    else{
+        m_picInCore->offOption(PicIn_Core::optionSubDir);
+    }
 
     numPic = m_picInCore->scanSrcFiles(nameFilters);
     if(numPic <= 0){
@@ -771,7 +776,12 @@ void MainWindow::slot_button_import_clicked(void)
     // Set overwrite flag
     //
 
-    m_picInCore->setFlagOverwrite(ui->checkBox_overwt->isChecked());
+    if(ui->checkBox_overwt->isChecked()){
+        m_picInCore->onOption(PicIn_Core::optionOverwrite);
+    }
+    else{
+        m_picInCore->offOption(PicIn_Core::optionOverwrite);
+    }
 
     //
     // Confirmation for importing

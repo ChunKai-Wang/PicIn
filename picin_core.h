@@ -31,6 +31,17 @@ public:
         OS_WIN = 1
     };
 
+    enum Option{
+        optionCancel = 0x01,
+        optionExifDate = 0x02,
+        optionDirYear = 0x04,
+        optionDirMon = 0x08,
+        optionDirDay = 0x10,
+        optionSubDir = 0x20,
+        optionOverwrite = 0x40
+    };
+    Q_DECLARE_FLAGS(Options, Option)
+
     PicIn_Core();
 
     int scanSrcFiles(QStringList filters);
@@ -48,6 +59,12 @@ public:
 
     void setLastModifyDateTime(QString path, QDate date, QTime time);
 
+    void setOption(Options options);
+    PicIn_Core::Options getOptions(void);
+    void onOption(Options on);
+    void offOption(Options off);
+    bool checkOption(Options check);
+
 private:
 
     typedef struct{
@@ -64,13 +81,7 @@ private:
     QStringList m_pathList_source;
     QStringList m_pathList_target;
 
-    bool m_flagCancel;
-    bool m_flagExifDate;
-    bool m_flagDirYear;
-    bool m_flagDirMon;
-    bool m_flagDirDay;
-    bool m_flagSubDir;
-    bool m_flagOverwrite;
+    PicIn_Core::Options m_options;
 
     int m_numFiles;
     int m_os;
@@ -82,5 +93,7 @@ signals:
 public slots:
 
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(PicIn_Core::Options)
 
 #endif // PICIN_CORE_H

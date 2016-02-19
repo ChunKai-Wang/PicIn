@@ -2,13 +2,8 @@
 
 PicIn_Core::PicIn_Core()
 {
-    m_flagCancel = false;
-    m_flagDirYear = false;
-    m_flagDirMon = false;
-    m_flagDirDay = false;
-    m_flagSubDir = false;
-    m_flagOverwrite = false;
     m_numFiles = 0;
+    m_options = 0;
 
 #ifdef Q_OS_LINUX
     m_os = OS_LINUX;
@@ -157,7 +152,7 @@ void PicIn_Core::import_doit()
     QDate date;
     QDir dir;
 
-    m_flagCancel = false;
+    offOption(optionCancel);
 
     //If we don't do this proccessEvents(),
     //progress dialog would no response until this function done.
@@ -175,31 +170,31 @@ void PicIn_Core::import_doit()
         // Check whether need to separate pics to folders as date
         //
 
-        if(m_flagExifDate){
+        if(checkOption(optionExifDate)){
             date = getExifDate(srcPath);
         }
-        if(!date.isValid() || !m_flagExifDate){
+        if(!date.isValid() || !checkOption(optionExifDate)){
             date = this->m_fileInfoList_img.at(i).lastModified().date();
         }
 
         yearPath.clear();
         monthPath.clear();
         dayPath.clear();
-        if(m_flagDirYear){
+        if(checkOption(optionDirYear)){
             yearPath.sprintf("/%04d/", date.year());
             tgtPath.append(yearPath);
             if(!dir.exists(tgtPath)){
                 dir.mkdir(tgtPath);
             }
         }
-        if(m_flagDirMon){
+        if(checkOption(optionDirMon)){
             monthPath.sprintf("/%02d/", date.month());
             tgtPath.append(monthPath);
             if(!dir.exists(tgtPath)){
                 dir.mkdir(tgtPath);
             }
         }
-        if(m_flagDirDay){
+        if(checkOption(optionDirDay)){
             dayPath.sprintf("/%02d/", date.day());
             tgtPath.append(dayPath);
             if(!dir.exists(tgtPath)){
@@ -212,7 +207,7 @@ void PicIn_Core::import_doit()
         //
 
         tgtPath.append(tgtName);
-        if(!file.exists(tgtPath) || m_flagOverwrite){
+        if(!file.exists(tgtPath) || checkOption(optionOverwrite)){
             file.copy(srcPath, tgtPath);
             setLastModifyDateTime(
                 tgtPath,
@@ -225,14 +220,14 @@ void PicIn_Core::import_doit()
         //
 
         emit signal_update_progress(i);
-        if(m_flagCancel){
+        if(checkOption(optionCancel)){
             break;
         }
 
         QApplication::processEvents(QEventLoop::AllEvents);
     }
 
-    m_flagCancel = false;
+    offOption(optionCancel);
 }
 
 /*
@@ -490,54 +485,62 @@ int PicIn_Core::getBlEndInt32(char bl, u_int8_t *buf, int len)
 }
 
 /*
- * name : setFlagDir
- * desc : Set flag to decide whether separate pics to different dir as date
+ * name : setOptions
+ * desc : Set m_options value
  * in   :
- *   year, Separate pics as year
- *   month, Separate pics as month
- *   day, Separate pics as day
+ *   options, Indicated options value
  */
-void PicIn_Core::setFlagDir(bool year, bool month, bool day)
+void PicIn_Core::setOption(Options options)
 {
-    m_flagDirYear = year;
-    m_flagDirMon = month;
-    m_flagDirDay = day;
+    m_options = options;
 }
 
 /*
- * name : setFlagCancel_true
- * desc : Set m_flagCancel to true
+ * name : getOptions
+ * desc : Get current options
+ * ret  :
+ *   Options, Current options
  */
-void PicIn_Core::setFlagCancel_true(void)
+PicIn_Core::Options PicIn_Core::getOptions(void)
 {
-    PicIn_Core::m_flagCancel = true;
+    return m_options;
 }
 
 /*
- * name : setFlagSubDir
- * desc : Set value of m_flagSubDir
+ * name : onOption
+ * desc : Enable specific option
+ * in   :
+ *   on, Option to disable
  */
-void PicIn_Core::setFlagSubDir(bool flag)
+void PicIn_Core::onOption(Options on)
 {
-    PicIn_Core::m_flagSubDir = flag;
+    m_options |= on;
+    return;
 }
 
 /*
- * name : setFlagOverwrite
- * desc : Set value of m_flagOverwrite
+ * name : offOption
+ * desc : Disable specific option
+ * in   :
+ *   off, Option to disable
  */
-void PicIn_Core::setFlagOverwrite(bool flag)
+void PicIn_Core::offOption(Options off)
 {
-    PicIn_Core::m_flagOverwrite = flag;
+    m_options &= ~off;
 }
 
 /*
- * name : setFlagExifDate
- * desc : Set value of m_flagExifDate
+ * name : checkOption
+ * desc : Check specific option has been set or not
+ * in   :
+ *   check, Option to check
+ * ret  :
+ *   true, if option has been set
+ *   false, Option is un-set
  */
-void PicIn_Core::setFlagExifDate(bool flag)
+bool PicIn_Core::checkOption(Options check)
 {
-    PicIn_Core::m_flagExifDate = flag;
+    return m_options & check;
 }
 
 // ****************************************************************************
@@ -597,7 +600,7 @@ PicIn_Core::get_file_list(QString path, QStringList filters)
     // Scan sub directory
     //
 
-    if(m_flagSubDir){
+    if(checkOption(optionSubDir)){
         QFileInfoList dirInfoList;
 
         dir.setFilter(QDir::NoSymLinks | QDir::Dirs | QDir::NoDotAndDotDot);
