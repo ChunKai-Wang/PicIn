@@ -36,10 +36,12 @@
 //
 
 #ifdef Q_OS_WIN
+#define FILE_PATH_SEPARATOR "\\"
 #define MODEL_FS_INDEX_TYPE_FOLDER "File Folder"
 #endif
 
 #ifdef Q_OS_LINUX
+#define FILE_PATH_SEPARATOR "/"
 #define MODEL_FS_INDEX_TYPE_FOLDER "Folder"
 #endif
 

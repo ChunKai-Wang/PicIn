@@ -109,16 +109,19 @@ MainWindow::getSelectedPathFromView(
  */
 QStringList MainWindow::rmOverlapParentPath(QStringList pathList)
 {
-    QStringList newPathList;
+    QStringList newPathList = pathList;
+    QString slash = QString(FILE_PATH_SEPARATOR);
     bool overlap = true;
-
-    newPathList.append(pathList);
 
     while(overlap){
         overlap = false;
 
         for(int i = 0; i < newPathList.size(); i++){
             QString rmPath = newPathList.at(i);
+            if(QString(rmPath.at(rmPath.size() - 1)).compare(slash)){
+                // Fill separator to end of path string or misjudge parent path
+                rmPath.append(slash);
+            }
 
             for(int j = 0; j < newPathList.size(); j++){
                 QString cmpPath = newPathList.at(j);
