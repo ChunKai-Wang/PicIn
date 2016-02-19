@@ -68,8 +68,8 @@ int PicIn_Core::set_path(QStringList pathList, PathType pt)
     //
 
     for(int i = 0; i < pathList.size(); i++){
-        QString path = pathList.at(i);
-        QChar lastChar = path.at(path.size() - 1);;
+        QString *path = (QString *)&pathList.at(i);
+        QChar lastChar = path->at(path->size() - 1);;
         QString slash;
 
         switch(m_os){
@@ -84,14 +84,14 @@ int PicIn_Core::set_path(QStringList pathList, PathType pt)
         }
 
         if(!operator ==(lastChar, slash.at(0))){
-            path.append(slash);
+            path->append(slash);
         }
 
         //
         // Check path
         //
 
-        QDir dir(path);
+        QDir dir(*path);
 
         if(!dir.exists()){
             return i + 1;
