@@ -8,6 +8,8 @@
 #include <QProcess>
 #include <QDebug>
 
+#include "utime.h"
+
 #ifdef Q_OS_WIN
 #include "stdint.h"
 typedef uint8_t u_int8_t;
@@ -57,7 +59,7 @@ public:
     void setFlagSubDir(bool flag);
     void setFlagOverwrite(bool flag);
 
-    void setLastModifyDateTime(QString path, QDate date, QTime time);
+    int setLastModifyDateTime(QString path, QDateTime laDateTime, QDateTime lmDateTime);
 
     void setOption(Options options);
     PicIn_Core::Options getOptions(void);
