@@ -8,10 +8,33 @@
 #include <QProcess>
 #include <QDebug>
 
+//
+// OS specific including
+//
+
+#ifdef Q_OS_LINUX
 #include "utime.h"
+#endif
 
 #ifdef Q_OS_WIN
 #include "stdint.h"
+#endif
+
+//
+// OS specific define
+//
+
+#ifdef Q_OS_WIN
+#define FILE_PATH_SEPARATOR "\\"
+#define MODEL_FS_INDEX_TYPE_FOLDER "File Folder"
+#endif
+
+#ifdef Q_OS_LINUX
+#define FILE_PATH_SEPARATOR "/"
+#define MODEL_FS_INDEX_TYPE_FOLDER "Folder"
+#endif
+
+#ifdef Q_OS_WIN
 typedef uint8_t u_int8_t;
 typedef uint16_t u_int16_t;
 typedef uint32_t u_int32_t;
@@ -86,7 +109,6 @@ private:
     PicIn_Core::Options m_options;
 
     int m_numFiles;
-    int m_os;
     QProcess m_process;
 
 signals:

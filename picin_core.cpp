@@ -4,13 +4,6 @@ PicIn_Core::PicIn_Core()
 {
     m_numFiles = 0;
     m_options = 0;
-
-#ifdef Q_OS_LINUX
-    m_os = OS_LINUX;
-#endif
-#ifdef Q_OS_WIN
-    m_os = OS_WIN;
-#endif
 }
 
 // ****************************************************************************
@@ -67,16 +60,7 @@ int PicIn_Core::set_path(QStringList pathList, PathType pt)
         QChar lastChar = path->at(path->size() - 1);;
         QString slash;
 
-        switch(m_os){
-        case OS_LINUX:
-        default:
-            slash.sprintf("%s", "/");
-            break;
-
-        case OS_WIN:
-            slash.sprintf("%s", "\\");
-            break;
-        }
+        slash.sprintf("%s", FILE_PATH_SEPARATOR);
 
         if(!operator ==(lastChar, slash.at(0))){
             path->append(slash);
@@ -126,16 +110,16 @@ int PicIn_Core::setLastModifyDateTime(
     QDateTime lmDateTime
 )
 {
-    if(m_os == OS_LINUX){
+#ifdef Q_OS_LINUX
         utimbuf timeBuf;
 
         timeBuf.actime = laDateTime.toTime_t();
         timeBuf.modtime = lmDateTime.toTime_t();
 
         return utime((const char*)path.toLatin1().data(), &timeBuf);
-    }
-
+#else
     return 0;
+#endif
 }
 
 /*
