@@ -594,6 +594,24 @@ void MainWindow::slot_button_browse_source_clicked(void)
 {
     QString dirPath;
     QStringList dirList;
+    QString startPath;
+
+    //
+    // Set start path of file dialog
+    //
+
+    startPath = QDir::homePath();
+    if(ui->lineEdit_path_source->text().length()){
+        QStringList srcList = (ui->lineEdit_path_source->text()).split(";", QString::SkipEmptyParts);
+        for(int i = 0; i < srcList.size(); i++){
+            if(srcList.at(i).length() > 0){
+                if(QDir(srcList.at(i)).exists()){
+                    startPath = srcList.at(i);
+                    break;
+                }
+            }
+        }
+    }
 
     //
     // Set fileDialog
@@ -602,7 +620,7 @@ void MainWindow::slot_button_browse_source_clicked(void)
     QFileDialog::Options fileOption = QFileDialog::ShowDirsOnly |
                                       QFileDialog::DontResolveSymlinks |
                                       QFileDialog::DontUseCustomDirectoryIcons;
-    dirList = selectPath(true, QFileDialog::Directory, QDir::homePath(), fileOption);
+    dirList = selectPath(true, QFileDialog::Directory, startPath, fileOption);
 
     //
     // Update ui
@@ -617,7 +635,9 @@ void MainWindow::slot_button_browse_source_clicked(void)
         }
     }
 
-    ui->lineEdit_path_source->setText(dirPath);
+    if(dirPath.length() > 0){
+        ui->lineEdit_path_source->setText(dirPath);
+    }
 }
 
 /*
@@ -628,6 +648,24 @@ void MainWindow::slot_button_browse_target_clicked(void)
 {
     QString dirPath;
     QStringList dirList;
+    QString startPath;
+
+    //
+    // Set start path of file dialog
+    //
+
+    startPath = QDir::homePath();
+    if(ui->lineEdit_path_source->text().length()){
+        QStringList tgtList = (ui->lineEdit_path_target->text()).split(";", QString::SkipEmptyParts);
+        for(int i = 0; i < tgtList.size(); i++){
+            if(tgtList.at(i).length() > 0){
+                if(QDir(tgtList.at(i)).exists()){
+                    startPath = tgtList.at(i);
+                    break;
+                }
+            }
+        }
+    }
 
     //
     // Set fileDialog
@@ -636,7 +674,7 @@ void MainWindow::slot_button_browse_target_clicked(void)
     QFileDialog::Options fileOption = QFileDialog::ShowDirsOnly |
                                       QFileDialog::DontResolveSymlinks |
                                       QFileDialog::DontUseCustomDirectoryIcons;
-    dirList = selectPath(false, QFileDialog::Directory, QDir::homePath(), fileOption);
+    dirList = selectPath(false, QFileDialog::Directory, startPath, fileOption);
 
     //
     // Update ui
@@ -651,7 +689,9 @@ void MainWindow::slot_button_browse_target_clicked(void)
         }
     }
 
-    ui->lineEdit_path_target->setText(dirPath);
+    if(dirPath.length() > 0){
+        ui->lineEdit_path_target->setText(dirPath);
+    }
 }
 
 /*
