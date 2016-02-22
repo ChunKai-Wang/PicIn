@@ -118,6 +118,8 @@ QStringList MainWindow::rmOverlapParentPath(QStringList pathList)
 
         for(int i = 0; i < newPathList.size(); i++){
             QString rmPath = newPathList.at(i);
+            rmPath = QDir::toNativeSeparators(rmPath);
+
             if(QString(rmPath.at(rmPath.size() - 1)).compare(slash)){
                 // Fill separator to end of path string or misjudge parent path
                 rmPath.append(slash);
@@ -125,6 +127,7 @@ QStringList MainWindow::rmOverlapParentPath(QStringList pathList)
 
             for(int j = 0; j < newPathList.size(); j++){
                 QString cmpPath = newPathList.at(j);
+                cmpPath = QDir::toNativeSeparators(cmpPath);
 
                 if(i == j){
                     continue;
