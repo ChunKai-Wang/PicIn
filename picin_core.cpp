@@ -17,9 +17,12 @@ PicIn_Core::PicIn_Core()
  */
 int PicIn_Core::scanSrcFiles(QStringList filters)
 {
-    m_fileInfoList_img.clear();
-    m_fileInfoList_img = get_file_list(m_pathList_source, filters);
-    m_numFiles = m_fileInfoList_img.size();
+    m_fileInfoList_src.clear();
+    m_fileInfoList_src = get_file_list(m_pathList_source, filters);
+
+    get_copyTgt_List();
+
+    m_numFiles = m_fileInfoList_src.size();
 
     return m_numFiles;
 }
@@ -143,66 +146,29 @@ void PicIn_Core::import_doit()
     //If we don't do this proccessEvents(),
     //progress dialog would no response until this function done.
     QApplication::processEvents(QEventLoop::AllEvents);
-    for(int i = 0; i < m_fileInfoList_img.size(); i++){
-        srcPath = this->m_fileInfoList_img.at(i).absoluteFilePath();
-
-        tgtName.clear();
-        tgtName.append(this->m_fileInfoList_img.at(i).fileName());
+    for(int i = 0; i < m_fileInfoList_src.size(); i++){
+        srcPath = m_fileInfoList_src.at(i).absoluteFilePath();
 
         tgtPath.clear();
-        tgtPath.append(m_pathList_target.at(0)); // Only support 1 target path
+        tgtPath = m_copyTgtList.at(i);
 
-        //
-        // Check whether need to separate pics to folders as date
-        //
-
-        if(checkOption(optionExifDate)){
-            date = getExifDate(srcPath);
-        }
-        if(!date.isValid() || !checkOption(optionExifDate)){
-            date = this->m_fileInfoList_img.at(i).lastModified().date();
-        }
-
-        yearPath.clear();
-        monthPath.clear();
-        dayPath.clear();
-        if(checkOption(optionDirYear)){
-            yearPath.sprintf("/%04d/", date.year());
-            tgtPath.append(yearPath);
-            if(!dir.exists(tgtPath)){
-                dir.mkdir(tgtPath);
-            }
-        }
-        if(checkOption(optionDirMon)){
-            monthPath.sprintf("/%02d/", date.month());
-            tgtPath.append(monthPath);
-            if(!dir.exists(tgtPath)){
-                dir.mkdir(tgtPath);
-            }
-        }
-        if(checkOption(optionDirDay)){
-            dayPath.sprintf("/%02d/", date.day());
-            tgtPath.append(dayPath);
-            if(!dir.exists(tgtPath)){
-                dir.mkdir(tgtPath);
-            }
+        dir = QDir(QFileInfo(tgtPath).dir());
+        if(!dir.exists()){
+            dir.mkpath(dir.absolutePath());
         }
 
         //
         // Copy file
         //
 
-        tgtPath.append(tgtName);
-        if(!file.exists(tgtPath) || checkOption(optionOverwrite)){
-            QDateTime laDateTime;
-            QDateTime lmDateTime;
+        QDateTime laDateTime;
+        QDateTime lmDateTime;
 
-            laDateTime = QFileInfo(srcPath).lastRead();
-            lmDateTime = QFileInfo(srcPath).lastModified();
+        laDateTime = QFileInfo(srcPath).lastRead();
+        lmDateTime = QFileInfo(srcPath).lastModified();
 
-            file.copy(srcPath, tgtPath);
-            setLastModifyDateTime(tgtPath, laDateTime ,lmDateTime);
-        }
+        file.copy(srcPath, tgtPath);
+        setLastModifyDateTime(tgtPath, laDateTime ,lmDateTime);
 
         //
         // Update progress bar and check cancel
@@ -607,6 +573,80 @@ PicIn_Core::get_file_list(QString path, QStringList filters)
     }
 
     return fileInfoList;
+}
+
+/*
+ * name : get_copyTgt_List
+ * desc : Scan whole source list and target path,
+ *        if path has existed and optionOverwrite is off,
+ *        the source path would removed from list
+ */
+void PicIn_Core::get_copyTgt_List(void)
+{
+    QFile file;
+    QString tgtName;
+    QString tgtPath;
+    QString yearPath;
+    QString monthPath;
+    QString dayPath;
+    QString srcPath;
+    QDate date;
+    QDir dir;
+    QFileInfoList tempSrcList;
+
+    tempSrcList.clear();
+    m_copyTgtList.clear();
+
+    for(int i = 0; i < m_fileInfoList_src.size(); i++){
+        srcPath = m_fileInfoList_src.at(i).absoluteFilePath();
+
+        tgtName.clear();
+        tgtName.append(m_fileInfoList_src.at(i).fileName());
+
+        tgtPath.clear();
+        tgtPath.append(m_pathList_target.at(0)); // Only support 1 target path
+
+        //
+        // Check whether need to separate pics to folders as date
+        //
+
+        if(checkOption(optionExifDate)){
+            date = getExifDate(srcPath);
+        }
+        if(!date.isValid() || !checkOption(optionExifDate)){
+            date = m_fileInfoList_src.at(i).lastModified().date();
+        }
+
+        yearPath.clear();
+        monthPath.clear();
+        dayPath.clear();
+        if(checkOption(optionDirYear)){
+            yearPath.sprintf("/%04d/", date.year());
+            tgtPath.append(yearPath);
+        }
+        if(checkOption(optionDirMon)){
+            monthPath.sprintf("/%02d/", date.month());
+            tgtPath.append(monthPath);
+        }
+        if(checkOption(optionDirDay)){
+            dayPath.sprintf("/%02d/", date.day());
+            tgtPath.append(dayPath);
+        }
+
+        //
+        // Check whether file need to be copied
+        //
+
+        tgtPath.append(tgtName);
+        if(!file.exists(tgtPath) || checkOption(optionOverwrite)){
+            m_copyTgtList.append(tgtPath);
+            tempSrcList.append(m_fileInfoList_src.at(i));
+        }
+    }
+
+    m_fileInfoList_src = tempSrcList;
+
+    return;
 }
 
 // ****************************************************************************

@@ -101,8 +101,10 @@ private:
 
     QFileInfoList get_file_list(QStringList pathList, QStringList filters);
     QFileInfoList get_file_list(QString path, QStringList filters);
+    void get_copyTgt_List(void);
 
-    QFileInfoList m_fileInfoList_img;
+    QFileInfoList m_fileInfoList_src;
+    QStringList m_copyTgtList;
     QStringList m_pathList_source;
     QStringList m_pathList_target;
 

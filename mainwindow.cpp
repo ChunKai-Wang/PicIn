@@ -529,34 +529,6 @@ void MainWindow::slot_import()
     connect(m_picInCore, SIGNAL(signal_update_progress(int)), dialogImportProgress->ui->progressBar, SLOT(setValue(int)));
 
     //
-    // Set import folder as date flags
-    //
-
-    PicIn_Core::Options dateOptions;
-    dateOptions = PicIn_Core::optionDirDay |
-                  PicIn_Core::optionDirMon |
-                  PicIn_Core::optionDirYear;
-    m_picInCore->offOption(dateOptions);
-    if(ui->checkBox_dirAsDate->isChecked()){
-        if(ui->radioBtn_dirAsY->isChecked()){
-            m_picInCore->onOption(PicIn_Core::optionDirYear);
-        }
-        else if(ui->radioBtn_dirAsYM->isChecked()){
-            m_picInCore->onOption(PicIn_Core::optionDirYear | PicIn_Core::optionDirMon);
-        }
-        else if(ui->radioBtn_dirAsYMD->isChecked()){
-            m_picInCore->onOption(dateOptions);
-        }
-
-        if(ui->checkBox_exifDate->isChecked()){
-            m_picInCore->onOption(PicIn_Core::optionExifDate);
-        }
-        else{
-            m_picInCore->offOption(PicIn_Core::optionExifDate);
-        }
-    }
-
-    //
     // Do import
     //
 
@@ -802,6 +774,45 @@ void MainWindow::slot_button_import_clicked(void)
     }
 
     //
+    // Set overwrite flag
+    //
+
+    if(ui->checkBox_overwt->isChecked()){
+        m_picInCore->onOption(PicIn_Core::optionOverwrite);
+    }
+    else{
+        m_picInCore->offOption(PicIn_Core::optionOverwrite);
+    }
+
+    //
+    // Set import folder as date flags
+    //
+
+    PicIn_Core::Options dateOptions;
+    dateOptions = PicIn_Core::optionDirDay |
+                  PicIn_Core::optionDirMon |
+                  PicIn_Core::optionDirYear;
+    m_picInCore->offOption(dateOptions);
+    if(ui->checkBox_dirAsDate->isChecked()){
+        if(ui->radioBtn_dirAsY->isChecked()){
+            m_picInCore->onOption(PicIn_Core::optionDirYear);
+        }
+        else if(ui->radioBtn_dirAsYM->isChecked()){
+            m_picInCore->onOption(PicIn_Core::optionDirYear | PicIn_Core::optionDirMon);
+        }
+        else if(ui->radioBtn_dirAsYMD->isChecked()){
+            m_picInCore->onOption(dateOptions);
+        }
+
+        if(ui->checkBox_exifDate->isChecked()){
+            m_picInCore->onOption(PicIn_Core::optionExifDate);
+        }
+        else{
+            m_picInCore->offOption(PicIn_Core::optionExifDate);
+        }
+    }
+
+    //
     // Get file list
     //
 
@@ -814,19 +825,8 @@ void MainWindow::slot_button_import_clicked(void)
 
     numPic = m_picInCore->scanSrcFiles(nameFilters);
     if(numPic <= 0){
-        emit signal_show_dialog("File not found");
+        emit signal_show_dialog("No file can be imported");
         return;
-    }
-
-    //
-    // Set overwrite flag
-    //
-
-    if(ui->checkBox_overwt->isChecked()){
-        m_picInCore->onOption(PicIn_Core::optionOverwrite);
-    }
-    else{
-        m_picInCore->offOption(PicIn_Core::optionOverwrite);
     }
 
     //
