@@ -520,6 +520,7 @@ void MainWindow::slot_import()
     dialogImportProgress->setAttribute(Qt::WA_DeleteOnClose);
     dialogImportProgress->setModal(true);
     dialogImportProgress->setWindowTitle(tr(" "));
+    dialogImportProgress->setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     dialogImportProgress->ui->progressBar->setRange(0, m_picInCore->getNumFilesSrc());
     dialogImportProgress->ui->progressBar->setValue(0);
     dialogImportProgress->ui->progressBar->setFormat("%v/%m");
@@ -532,7 +533,11 @@ void MainWindow::slot_import()
     // Do import
     //
 
+    ui->statusBar->showMessage("Importing...");
+
     m_picInCore->import_doit();
+
+    ui->statusBar->showMessage("Done");
 
     //
     // done.
@@ -672,25 +677,32 @@ void MainWindow::slot_button_browse_target_clicked(void)
  */
 void MainWindow::slot_button_import_clicked(void)
 {
+    int ret = 0;
+    int numPic = 0;
+    QStringList nameFilters;
+    QString fileNum;
+    PicIn_Core::Options dateOptions;
+
+    ui->button_import->setEnabled(false);
+
     //
     // Check empty path
     //
 
     if(ui->lineEdit_path_source->text().length() == 0){
         emit signal_show_dialog(tr("Please input source path"));
-        return;
+        goto errout;
     }
 
     if(ui->lineEdit_path_target->text().length() == 0){
         emit signal_show_dialog(tr("Please input target path"));
-        return;
+        goto errout;
     }
 
     //
     // Check whether path is exist
     //
 
-    int ret = 0;
     ret = m_picInCore->set_path(
               ui->lineEdit_path_source->text().split(";", QString::SkipEmptyParts),
               PicIn_Core::PT_Source);
@@ -704,13 +716,13 @@ void MainWindow::slot_button_import_clicked(void)
             errStr.sprintf("Source path isn't' exist");
         }
         emit signal_show_dialog(errStr);
-        return;
+        goto errout;
     }
 
     // Currently, only support single target path
     if(ui->lineEdit_path_target->text().split(";", QString::SkipEmptyParts).size() > 1){
         emit signal_show_dialog("Only support single target path");
-        return;
+        goto errout;
     }
 
     ret = m_picInCore->set_path(
@@ -718,15 +730,12 @@ void MainWindow::slot_button_import_clicked(void)
               PicIn_Core::PT_Target);
     if(ret != 0){
         emit signal_show_dialog("Target path isn't' exist");
-        return;
+        goto errout;
     }
 
     //
     // Set file name filter
     //
-
-    QStringList nameFilters;
-    int numPic = 0;
 
     if(ui->checkBox_fileFmt_jpg->isChecked()){
         nameFilters.append(tr("*.jpg"));
@@ -770,7 +779,7 @@ void MainWindow::slot_button_import_clicked(void)
 
     if(nameFilters.size() == 0){
         emit signal_show_dialog("Please choose least one file type");
-        return;
+        goto errout;
     }
 
     //
@@ -788,10 +797,10 @@ void MainWindow::slot_button_import_clicked(void)
     // Set import folder as date flags
     //
 
-    PicIn_Core::Options dateOptions;
     dateOptions = PicIn_Core::optionDirDay |
                   PicIn_Core::optionDirMon |
                   PicIn_Core::optionDirYear;
+
     m_picInCore->offOption(dateOptions);
     if(ui->checkBox_dirAsDate->isChecked()){
         if(ui->radioBtn_dirAsY->isChecked()){
@@ -823,17 +832,20 @@ void MainWindow::slot_button_import_clicked(void)
         m_picInCore->offOption(PicIn_Core::optionSubDir);
     }
 
+    ui->statusBar->showMessage("Scanning...");
+
     numPic = m_picInCore->scanSrcFiles(nameFilters);
     if(numPic <= 0){
         emit signal_show_dialog("No file can be imported");
-        return;
+        goto errout;
     }
+
+    ui->statusBar->clearMessage();
 
     //
     // Confirmation for importing
     //
 
-    QString fileNum;
     fileNum.sprintf("%d files will imported", numPic);
 
     DialogImportChecker *dialogImportChecker = new DialogImportChecker(0);
@@ -841,10 +853,18 @@ void MainWindow::slot_button_import_clicked(void)
     dialogImportChecker->setModal(true);
     dialogImportChecker->ui->label_sts->setText(fileNum);
     dialogImportChecker->setWindowTitle(tr(" "));
+    dialogImportChecker->setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     dialogImportChecker->show();
 
     dialogImportChecker->setAttribute(Qt::WA_DeleteOnClose);
     connect(dialogImportChecker, SIGNAL(accepted()), this, SLOT(slot_import()));
+
+    //
+    // done
+    //
+
+errout:
+    ui->button_import->setEnabled(true);
 }
 
 /*
@@ -859,6 +879,7 @@ void MainWindow::slot_show_dialog(QString infoToShow)
     dialogMsg->setParent(0);
     dialogMsg->set_label_text(infoToShow);
     dialogMsg->window()->setWindowTitle(" ");
+    dialogMsg->window()->setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     dialogMsg->setModal(true);
     dialogMsg->setAttribute(Qt::WA_DeleteOnClose);
     dialogMsg->exec();

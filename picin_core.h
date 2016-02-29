@@ -51,11 +51,6 @@ public:
         PT_Target = 1
     };
 
-    enum OsType{
-        OS_LINUX = 0,
-        OS_WIN = 1
-    };
-
     enum Option{
         optionCancel = 0x01,
         optionExifDate = 0x02,
