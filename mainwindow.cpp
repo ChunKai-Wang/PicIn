@@ -692,8 +692,8 @@ void MainWindow::slot_button_import_clicked(void)
 
     int ret = 0;
     ret = m_picInCore->set_path(
-                ui->lineEdit_path_source->text().split(";"),
-                PicIn_Core::PT_Source);
+              ui->lineEdit_path_source->text().split(";", QString::SkipEmptyParts),
+              PicIn_Core::PT_Source);
     if(ret != 0){
         QString errStr;
 
@@ -708,14 +708,14 @@ void MainWindow::slot_button_import_clicked(void)
     }
 
     // Currently, only support single target path
-    if(ui->lineEdit_path_target->text().split(";").size() > 1){
+    if(ui->lineEdit_path_target->text().split(";", QString::SkipEmptyParts).size() > 1){
         emit signal_show_dialog("Only support single target path");
         return;
     }
 
     ret = m_picInCore->set_path(
-               ui->lineEdit_path_target->text().split(";"),
-               PicIn_Core::PT_Target);
+              ui->lineEdit_path_target->text().split(";", QString::SkipEmptyParts),
+              PicIn_Core::PT_Target);
     if(ret != 0){
         emit signal_show_dialog("Target path isn't' exist");
         return;
