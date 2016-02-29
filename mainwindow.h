@@ -28,7 +28,7 @@
 #include "pwd.h"
 #endif
 
-#define PICIN_VER "v0.1"
+#define PICIN_VER "v0.2"
 #define CFG_FILE_NAME ".picin.cfg"
 
 //
