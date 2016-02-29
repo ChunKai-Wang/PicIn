@@ -213,6 +213,11 @@ QStringList MainWindow::selectPath(
     if(QDir(gvfsPath).exists()){
         urls.append(QUrl::fromLocalFile(gvfsPath));
     }
+
+    if(QDir("/media/").exists()){
+        urls.append(QUrl::fromLocalFile("/media/"));
+    }
+
     urls.append(QUrl::fromLocalFile(QDir::rootPath()));
 #endif
 
@@ -682,6 +687,7 @@ void MainWindow::slot_button_import_clicked(void)
     QStringList nameFilters;
     QString fileNum;
     PicIn_Core::Options dateOptions;
+    DialogImportChecker *dialogImportChecker;
 
     ui->button_import->setEnabled(false);
 
@@ -848,7 +854,7 @@ void MainWindow::slot_button_import_clicked(void)
 
     fileNum.sprintf("%d files will imported", numPic);
 
-    DialogImportChecker *dialogImportChecker = new DialogImportChecker(0);
+    dialogImportChecker = new DialogImportChecker(0);
     dialogImportChecker->setParent(0);
     dialogImportChecker->setModal(true);
     dialogImportChecker->ui->label_sts->setText(fileNum);
